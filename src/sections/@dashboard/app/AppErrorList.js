@@ -13,7 +13,6 @@ import {
   Typography,
 } from '@mui/material';
 // utils
-import { useTheme } from '@mui/material/styles';
 import { fDateTime } from '../../../utils/formatTime';
 // components
 import Iconify from '../../../components/iconify';
@@ -58,15 +57,15 @@ export default function AppErrorList({ title, subheader, list, loading, ...other
 ErrorItem.propTypes = {
   error: PropTypes.shape({
     description: PropTypes.string,
-    robotName: PropTypes.string,
+    robotCode: PropTypes.string,
+    color: PropTypes.string,
+    count: PropTypes.string,
     postedAt: PropTypes.instanceOf(Date),
     title: PropTypes.string,
   }),
 };
 
 function ErrorItem({ error }) {
-  const theme = useTheme();
-
   const { robotCode, title, description, postedAt, color, count } = error;
 
   return (
