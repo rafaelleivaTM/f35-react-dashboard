@@ -1,4 +1,4 @@
-import { format, getTime, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow, getTime } from 'date-fns';
 
 // ----------------------------------------------------------------------
 
@@ -6,6 +6,12 @@ export function fDate(date, newFormat) {
   const fm = newFormat || 'dd MMM yyyy';
 
   return date ? format(new Date(date), fm) : '';
+}
+
+export function getDateFormatted(date = null) {
+  const fm = 'yyyy-MM-dd';
+
+  return date ? format(new Date(date), fm) : format(new Date(), fm);
 }
 
 export function fDateTime(date, newFormat) {

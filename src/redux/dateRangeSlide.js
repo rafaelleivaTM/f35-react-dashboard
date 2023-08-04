@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { getDateFormatted } from '../utils/formatTime';
 
 const initialState = {
-  startDate: new Date(),
-  endDate: new Date(),
+  startDate: getDateFormatted(),
+  endDate: getDateFormatted(),
 };
 
 const dateRangeSlice = createSlice({

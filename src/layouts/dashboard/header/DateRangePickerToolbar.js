@@ -3,6 +3,7 @@ import { DateRangePicker } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { dateRangeUpdated } from '../../../redux/dateRangeSlide';
+import { getDateFormatted } from '../../../utils/formatTime';
 
 export const DateRangePickerToolbar = () => {
   const dateRange = useSelector((state) => state.dateRange);
@@ -21,8 +22,8 @@ export const DateRangePickerToolbar = () => {
   const onChangeRangeAction = (range) => {
     dispatch(
       dateRangeUpdated({
-        startDate: range[0].toISOString(),
-        endDate: range[1].toISOString(),
+        startDate: getDateFormatted(range[0]),
+        endDate: getDateFormatted(range[1]),
       })
     );
   };
