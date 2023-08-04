@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
 // @mui
-import { useTheme, styled } from '@mui/material/styles';
-import { Card, CardHeader } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { Card, CardHeader, CircularProgress } from '@mui/material';
 // utils
 import { fNumber } from '../../../utils/formatNumber';
 // components
@@ -31,14 +31,16 @@ const StyledChartWrapper = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-AppCurrentVisits.propTypes = {
+DonutChartPanel.propTypes = {
   title: PropTypes.string,
+  total: PropTypes.number,
   subheader: PropTypes.string,
   chartColors: PropTypes.arrayOf(PropTypes.string),
   chartData: PropTypes.array,
+  loading: PropTypes.bool,
 };
 
-export default function AppCurrentVisits({ title, subheader, chartColors, chartData, ...other }) {
+export default function DonutChartPanel({ title, total, subheader, chartColors, chartData, loading, ...other }) {
   const theme = useTheme();
 
   const chartLabels = chartData.map((i) => i.label);
@@ -61,16 +63,29 @@ export default function AppCurrentVisits({ title, subheader, chartColors, chartD
       },
     },
     plotOptions: {
-      pie: { donut: { labels: { show: false } } },
+      pie: {
+        donut: {
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              showAlways: true,
+              fontSize: '22px',
+              fontFamily: 'Helvetica, Arial, sans-serif',
+              fontWeight: 600,
+              color: '#09495d',
+            },
+          },
+        },
+      },
     },
   });
 
   return (
     <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
-
+      <CardHeader title={title} subheader={subheader} action={loading ? <CircularProgress size={30} /> : <></>} />
       <StyledChartWrapper dir="ltr">
-        <ReactApexChart type="pie" series={chartSeries} options={chartOptions} height={280} />
+        <ReactApexChart title={total} type="donut" series={chartSeries} options={chartOptions} height={280} />
       </StyledChartWrapper>
     </Card>
   );

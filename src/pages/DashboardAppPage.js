@@ -2,38 +2,79 @@ import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography } from '@mui/material';
+import { Container, Grid } from '@mui/material';
 // components
+import { useEffect, useState } from 'react';
 import Iconify from '../components/iconify';
 // sections
 import {
-  AppTasks,
-  AppNewsUpdate,
-  AppOrderTimeline,
-  AppCurrentVisits,
-  AppWebsiteVisits,
-  AppTrafficBySite,
-  AppWidgetSummary,
-  AppCurrentSubject,
   AppConversionRates,
+  AppCurrentSubject,
+  AppErrorList,
+  AppOrderTimeline,
+  AppTasks,
+  AppTrafficBySite,
+  AppWebsiteVisits,
+  AppWidgetSummary,
+  DonutChartPanel,
 } from '../sections/@dashboard/app';
+import apiService from '../services/apiService';
+import { ROBOTS } from '../utils/constants';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const theme = useTheme();
 
+  const [robotsData, setRobotsData] = useState({});
+  const [robotsErrorInfo, setRobotsErrorInfo] = useState([]);
+  const [loadingRobotsErrors, setLoadingRobotsErrors] = useState(false);
+
+  const fetchRobotsStatsData = async () => {
+    const data = await apiService.getRobotsStats();
+    setRobotsData(data);
+    console.log(data);
+  };
+
+  const fetchRobotsErrorInfo = async () => {
+    setLoadingRobotsErrors(true);
+    const data = await apiService.getRobotsErrorInfo();
+    const errors = [];
+    ROBOTS.forEach((robot) => {
+      const robotErrorList = data[robot.name];
+      if (robotErrorList) {
+        robotErrorList.forEach((error) => {
+          errors.push({
+            id: faker.datatype.uuid(),
+            title: `${error.error.substring(0, 50)}...`,
+            description: error.error,
+            robotName: robot.name,
+            robotCode: robot.displayAvatarCode,
+            color: robot.color,
+            postedAt: faker.date.recent(),
+            count: error.count,
+          });
+        });
+      }
+    });
+    errors.sort((a, b) => b.count - a.count);
+    console.log(errors);
+    setLoadingRobotsErrors(false);
+    setRobotsErrorInfo(errors);
+  };
+
+  useEffect(() => {
+    fetchRobotsStatsData().then();
+    fetchRobotsErrorInfo().then();
+  }, []);
+
   return (
     <>
       <Helmet>
-        <title> Dashboard | Minimal UI </title>
+        <title> F35 Dashboard </title>
       </Helmet>
 
       <Container maxWidth="xl">
-        <Typography variant="h4" sx={{ mb: 5 }}>
-          Hi, Welcome back
-        </Typography>
-
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
@@ -92,19 +133,35 @@ export default function DashboardAppPage() {
           </Grid>
 
           <Grid item xs={12} md={6} lg={4}>
-            <AppCurrentVisits
-              title="Current Visits"
+            <DonutChartPanel
+              title="F35 Summary"
+              total={parseInt(robotsData?.stats?.summary?.total, 10) || 0}
+              loading={robotsData?.stats?.summary === undefined}
               chartData={[
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
+                { label: 'In Progress', value: parseInt(robotsData?.stats?.summary?.inProgress, 10) || 0 },
+                { label: 'Pending', value: parseInt(robotsData?.stats?.summary?.pending, 10) || 0 },
+                { label: 'Waiting Payment', value: parseInt(robotsData?.stats?.summary?.waitingPayment, 10) || 0 },
+                { label: 'Manual', value: parseInt(robotsData?.stats?.summary?.manual, 10) || 0 },
+                { label: 'Cancelled', value: parseInt(robotsData?.stats?.summary?.cancelled, 10) || 0 },
+                { label: 'Warning', value: parseInt(robotsData?.stats?.summary?.warning, 10) || 0 },
+                { label: 'Purchased', value: parseInt(robotsData?.stats?.summary?.purchased, 10) || 0 },
+                {
+                  label: 'Blocked',
+                  value:
+                    parseInt(robotsData?.stats?.summary?.blocked, 10) || robotsData?.stats?.summary === undefined
+                      ? 1
+                      : 0,
+                },
               ]}
               chartColors={[
-                theme.palette.primary.main,
-                theme.palette.info.main,
-                theme.palette.warning.main,
-                theme.palette.error.main,
+                'rgb(36,157,241)', // IN progress
+                'rgb(193,104,169)', // Pending
+                'rgb(248,157,157)', // Waiting Payment
+                'rgb(142,244,8)', // Manual
+                'rgba(153, 102, 255, 1)', // Cancelled
+                'rgba(255, 159, 64, 1)', // Warning
+                'rgb(27,157,114)', // Completed
+                'rgb(190,190,190)', // Blocked
               ]}
             />
           </Grid>
@@ -141,20 +198,11 @@ export default function DashboardAppPage() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={8}>
-            <AppNewsUpdate
-              title="News Update"
-              list={[...Array(5)].map((_, index) => ({
-                id: faker.datatype.uuid(),
-                title: faker.name.jobTitle(),
-                description: faker.name.jobTitle(),
-                image: `/assets/images/covers/cover_${index + 1}.jpg`,
-                postedAt: faker.date.recent(),
-              }))}
-            />
+          <Grid item xs={12} md={12} lg={12}>
+            <AppErrorList title="Errores" list={robotsErrorInfo} loading={loadingRobotsErrors} />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={4} lg={3}>
             <AppOrderTimeline
               title="Order Timeline"
               list={[...Array(5)].map((_, index) => ({
@@ -172,7 +220,7 @@ export default function DashboardAppPage() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={4} lg={4}>
             <AppTrafficBySite
               title="Traffic by Site"
               list={[
@@ -200,7 +248,7 @@ export default function DashboardAppPage() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={8}>
+          <Grid item xs={12} md={4} lg={5}>
             <AppTasks
               title="Tasks"
               list={[
