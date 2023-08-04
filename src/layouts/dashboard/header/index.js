@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Box, Stack, AppBar, Toolbar, IconButton } from '@mui/material';
+import { AppBar, Box, Divider, IconButton, Stack, Toolbar } from '@mui/material';
 // utils
 import { bgBlur } from '../../../utils/cssStyles';
 // components
@@ -11,6 +11,7 @@ import Searchbar from './Searchbar';
 import AccountPopover from './AccountPopover';
 import LanguagePopover from './LanguagePopover';
 import NotificationsPopover from './NotificationsPopover';
+import { DateRangePickerToolbar } from './DateRangePickerToolbar';
 
 // ----------------------------------------------------------------------
 
@@ -68,6 +69,8 @@ export default function Header({ onOpenNav }) {
             sm: 1,
           }}
         >
+          <DateRangePickerToolbar />
+          <Divider orientation={'vertical'} variant={'middle'} flexItem />
           <LanguagePopover />
           <NotificationsPopover />
           <AccountPopover />
