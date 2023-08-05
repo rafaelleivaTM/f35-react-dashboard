@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow, getTime } from 'date-fns';
+import { format, formatDistanceToNow, getTime } from "date-fns";
 
 // ----------------------------------------------------------------------
 
@@ -31,3 +31,10 @@ export function fToNow(date) {
       })
     : '';
 }
+
+export const addOneDay = (strDate) => {
+  // return the strdate in the same format with one day added
+  const date = new Date(strDate);
+  date.setDate(date.getDate() + 1);
+  return getDateFormatted(date);
+};

@@ -17,17 +17,6 @@ const dateRangeSlice = createSlice({
       state.startDate = startDate;
       state.endDate = endDate;
     },
-    // todoToggled(state, action) {
-    //   // Look for the specific nested object to update.
-    //   // In this case, `action.payload` is the default field in the action,
-    //   // and can hold the `id` value - no need for `action.id` separately
-    //   const matchingTodo = state.todos.find(todo1 => todo1.id === action.payload)
-    //
-    //   if (matchingTodo) {
-    //     // Can directly "mutate" the nested object
-    //     matchingTodo.completed = !matchingTodo.completed
-    //   }
-    // }
   },
 });
 

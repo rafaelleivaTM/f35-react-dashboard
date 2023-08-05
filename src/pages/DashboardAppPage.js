@@ -1,11 +1,12 @@
-import { Helmet } from 'react-helmet-async';
-import { faker } from '@faker-js/faker';
+import { Helmet } from "react-helmet-async";
+import { faker } from "@faker-js/faker";
 // @mui
-import { useTheme } from '@mui/material/styles';
-import { Container, Grid } from '@mui/material';
+import { useTheme } from "@mui/material/styles";
+import { Container, Grid } from "@mui/material";
 // components
-import { useEffect, useState } from 'react';
-import Iconify from '../components/iconify';
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import Iconify from "../components/iconify";
 // sections
 import {
   AppConversionRates,
@@ -14,21 +15,33 @@ import {
   AppOrderTimeline,
   AppTasks,
   AppTrafficBySite,
-  AppWebsiteVisits,
   AppWidgetSummary,
-  DonutChartPanel,
-} from '../sections/@dashboard/app';
-import apiService from '../services/apiService';
-import { ROBOTS } from '../utils/constants';
+  DonutChartPanel
+} from "../sections/@dashboard/app";
+import apiService from "../services/apiService";
+import { ROBOTS } from "../utils/constants";
+import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+  const dateRange = useSelector((state) => state.dateRange);
 
   const [robotsData, setRobotsData] = useState({});
   const [robotsErrorInfo, setRobotsErrorInfo] = useState([]);
   const [loadingRobotsErrors, setLoadingRobotsErrors] = useState(false);
+
+  const [generalSummary, setGeneralSummary] = useState([]);
+  const [loadingGeneralSummary, setLoadingGeneralSummary] = useState(false);
+
+  const fetchGeneralSummary = async () => {
+    setLoadingGeneralSummary(true);
+    const response = await apiService.getRobotsSummaryByRange(dateRange.startDate, dateRange.endDate);
+    setLoadingGeneralSummary(false);
+    setGeneralSummary(response.data);
+    console.log(response);
+  };
 
   const fetchRobotsStatsData = async () => {
     const data = await apiService.getRobotsStats();
@@ -58,10 +71,13 @@ export default function DashboardAppPage() {
       }
     });
     errors.sort((a, b) => b.count - a.count);
-    console.log(errors);
     setLoadingRobotsErrors(false);
     setRobotsErrorInfo(errors);
   };
+
+  useEffect(() => {
+    fetchGeneralSummary().then();
+  }, [dateRange]);
 
   useEffect(() => {
     fetchRobotsStatsData().then();
@@ -93,42 +109,48 @@ export default function DashboardAppPage() {
           </Grid>
 
           <Grid item xs={12} md={6} lg={8}>
-            <AppWebsiteVisits
-              title="Website Visits"
-              subheader="(+43%) than last year"
-              chartLabels={[
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ]}
-              chartData={[
-                {
-                  name: 'Team A',
-                  type: 'column',
-                  fill: 'solid',
-                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-                },
-                {
-                  name: 'Team B',
-                  type: 'area',
-                  fill: 'gradient',
-                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-                },
-                {
-                  name: 'Team C',
-                  type: 'line',
-                  fill: 'solid',
-                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-                },
-              ]}
+            {/* <AppWebsiteVisits */}
+            {/*  title="Website Visits" */}
+            {/*  subheader="(+43%) than last year" */}
+            {/*  chartLabels={[ */}
+            {/*    '01/01/2003', */}
+            {/*    '02/01/2003', */}
+            {/*    '03/01/2003', */}
+            {/*    '04/01/2003', */}
+            {/*    '05/01/2003', */}
+            {/*    '06/01/2003', */}
+            {/*    '07/01/2003', */}
+            {/*    '08/01/2003', */}
+            {/*    '09/01/2003', */}
+            {/*    '10/01/2003', */}
+            {/*    '11/01/2003', */}
+            {/*  ]} */}
+            {/*  chartData={[ */}
+            {/*    { */}
+            {/*      name: 'Team A', */}
+            {/*      type: 'column', */}
+            {/*      fill: 'solid', */}
+            {/*      data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30], */}
+            {/*    }, */}
+            {/*    { */}
+            {/*      name: 'Team B', */}
+            {/*      type: 'area', */}
+            {/*      fill: 'gradient', */}
+            {/*      data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43], */}
+            {/*    }, */}
+            {/*    { */}
+            {/*      name: 'Team C', */}
+            {/*      type: 'line', */}
+            {/*      fill: 'solid', */}
+            {/*      data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39], */}
+            {/*    }, */}
+            {/*  ]} */}
+            {/* /> */}
+            <BarChartSummaryRangeInfo
+              title="Summary by range"
+              subheader={`From ${dateRange.startDate} to ${dateRange.endDate}`}
+              chartData={generalSummary}
+              loading={loadingGeneralSummary}
             />
           </Grid>
 

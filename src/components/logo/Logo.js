@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types';
-import { forwardRef } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import PropTypes from "prop-types";
+import { forwardRef } from "react";
+import { Link as RouterLink } from "react-router-dom";
 // @mui
-import { useTheme } from '@mui/material/styles';
-import { Box, Link } from '@mui/material';
+import { useTheme } from "@mui/material/styles";
+import { Box, Link } from "@mui/material";
 
 // ----------------------------------------------------------------------
 
@@ -43,8 +43,8 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
         xmlns="http://www.w3.org/2000/svg"
         x="0px"
         y="0px"
-        width="100%"
-        height="100%"
+        width="auto"
+        height="auto"
         viewBox="0 0 396.85 108.977"
         enableBackground="new 0 0 396.85 108.977"
       >

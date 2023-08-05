@@ -28,17 +28,23 @@ export const DateRangePickerToolbar = () => {
     );
   };
 
+  const dateRangeValue = [new Date(dateRange.startDate), new Date(dateRange.endDate)];
+  // convert dateRangeValue values to UTC date
+  dateRangeValue[0] = new Date(dateRangeValue[0].getTime() + dateRangeValue[0].getTimezoneOffset() * 60000);
+  dateRangeValue[1] = new Date(dateRangeValue[1].getTime() + dateRangeValue[1].getTimezoneOffset() * 60000);
+
   return (
     <DateRangePicker
       appearance="subtle"
+      value={dateRangeValue}
+      onChange={(range) => onChangeRangeAction(range)}
       disabledDate={afterToday()}
-      defaultValue={[new Date(dateRange.startDate), new Date(dateRange.endDate)]}
+      // defaultValue={[new Date(dateRange.startDate), new Date(dateRange.endDate)]}
       defaultCalendarValue={[lastMonth, now]}
       cleanable={false}
       placement={'autoVerticalEnd'}
       menuStyle={{ zIndex: 9999, marginTop: '.3rem' }}
       preventOverflow
-      onChange={(range) => onChangeRangeAction(range)}
     />
   );
 };

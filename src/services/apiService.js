@@ -9,6 +9,10 @@ const apiService = {
     const response = await fetch(`${F35_API_URL}/getRobotsErrorInfo`);
     return response.json();
   },
+  getRobotsSummaryByRange: async (from, to) => {
+    const response = await fetch(`${F35_API_URL}/getRobotsSummaryByRange?from=${from}&to=${to}`);
+    return response.json();
+  },
 };
 
 export default apiService;
