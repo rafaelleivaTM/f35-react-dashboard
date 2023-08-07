@@ -1,17 +1,17 @@
-import PropTypes from 'prop-types';
-import ReactApexChart from 'react-apexcharts';
+import PropTypes from "prop-types";
+import ReactApexChart from "react-apexcharts";
 // @mui
-import { styled, useTheme } from '@mui/material/styles';
-import { Card, CardHeader, CircularProgress } from '@mui/material';
+import { styled, useTheme } from "@mui/material/styles";
+import { Card, CardHeader, CircularProgress } from "@mui/material";
 // utils
-import { fNumber } from '../../../utils/formatNumber';
+import { fNumber } from "../../../utils/formatNumber";
 // components
-import { useChart } from '../../../components/chart';
+import { useChart } from "../../../components/chart";
 
 // ----------------------------------------------------------------------
 
-const CHART_HEIGHT = 372;
-const LEGEND_HEIGHT = 72;
+const CHART_HEIGHT = 332;
+const LEGEND_HEIGHT = 102;
 
 const StyledChartWrapper = styled('div')(({ theme }) => ({
   height: CHART_HEIGHT,
@@ -85,7 +85,7 @@ export default function DonutChartPanel({ title, total, subheader, chartColors, 
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} action={loading ? <CircularProgress size={30} /> : <></>} />
       <StyledChartWrapper dir="ltr">
-        <ReactApexChart title={total} type="donut" series={chartSeries} options={chartOptions} height={280} />
+        <ReactApexChart title={total} type="donut" series={chartSeries} options={chartOptions} height={240} />
       </StyledChartWrapper>
     </Card>
   );

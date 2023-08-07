@@ -1,21 +1,22 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // @mui
-import { styled } from '@mui/material/styles';
-import { AppBar, Box, Divider, IconButton, Stack, Toolbar } from '@mui/material';
+import { styled } from "@mui/material/styles";
+import { AppBar, Box, Divider, IconButton, Stack, Toolbar } from "@mui/material";
 // utils
-import { bgBlur } from '../../../utils/cssStyles';
+import { bgBlur } from "../../../utils/cssStyles";
 // components
-import Iconify from '../../../components/iconify';
+import Iconify from "../../../components/iconify";
 //
-import Searchbar from './Searchbar';
-import AccountPopover from './AccountPopover';
-import LanguagePopover from './LanguagePopover';
-import NotificationsPopover from './NotificationsPopover';
-import { DateRangePickerToolbar } from './DateRangePickerToolbar';
+import Searchbar from "./Searchbar";
+import AccountPopover from "./AccountPopover";
+import LanguagePopover from "./LanguagePopover";
+import NotificationsPopover from "./NotificationsPopover";
+import { DateRangePickerToolbar } from "./DateRangePickerToolbar";
+import SchedulerApiUpdater from "../../../components/scheduler_api_call/SchedulerApiUpdate";
 
 // ----------------------------------------------------------------------
 
-const NAV_WIDTH = 280;
+const NAV_WIDTH = 250;
 
 const HEADER_MOBILE = 64;
 
@@ -69,6 +70,8 @@ export default function Header({ onOpenNav }) {
             sm: 1,
           }}
         >
+          <SchedulerApiUpdater />
+          <Divider orientation={'vertical'} variant={'middle'} flexItem />
           <DateRangePickerToolbar />
           <Divider orientation={'vertical'} variant={'middle'} flexItem />
           <LanguagePopover />

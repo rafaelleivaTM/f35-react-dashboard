@@ -54,12 +54,27 @@ export default function BarChartSummaryRangeInfo({ title, subheader, chartLabels
   const options = {
     chart: {
       type: 'bar',
+      stacked: true,
+      toolbar: {
+        show: true,
+      },
+      zoom: {
+        enabled: true,
+      },
     },
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: '90%',
         endingShape: 'rounded',
+        dataLabels: {
+          total: {
+            enabled: true,
+            style: {
+              fontSize: '13px',
+              fontWeight: 900,
+            },
+          },
+        },
       },
     },
     dataLabels: {
@@ -73,13 +88,18 @@ export default function BarChartSummaryRangeInfo({ title, subheader, chartLabels
     xaxis: {
       categories,
     },
+    legend: {
+      position: 'right',
+      offsetY: 40,
+    },
     yaxis: {
+      logarithmic: true,
       title: {
         text: 'Procesadas',
       },
     },
     fill: {
-      opacity: [1],
+      // opacity: [1, 1, 1],
     },
     tooltip: {
       y: {
