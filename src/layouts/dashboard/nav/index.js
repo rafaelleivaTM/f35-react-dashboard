@@ -77,8 +77,8 @@ export default function Nav({ openNav, onCloseNav }) {
 
       <NavSection data={navConfig} />
 
-      <Box display="flex" justifyContent="center" alignItems="center" sx={{ px: 2.5, pb: 3, flexGrow: 1 }}>
-        <Stack alignItems="center" spacing={3} sx={{ borderRadius: 2, position: 'relative' }}>
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ px: 2.5, flexGrow: 1 }}>
+        <Stack alignItems="center" spacing={1} sx={{ borderRadius: 2, position: 'relative' }}>
           <Box
             component="img"
             src="/favicon/f35-plane.png"
@@ -88,6 +88,12 @@ export default function Nav({ openNav, onCloseNav }) {
               objectFit: 'cover',
             }}
           />
+
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography gutterBottom variant="h6">
+              F35
+            </Typography>
+          </Box>
         </Stack>
       </Box>
     </Scrollbar>
