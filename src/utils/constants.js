@@ -55,13 +55,7 @@ export const STATUS_COLORS = [
 ];
 
 export const TIME_INTERVAL = {
-  m: (t) => {
-    return 1000 * 60 * t;
-  },
-  h: (t) => {
-    return 1000 * 60 * 60 * t;
-  },
-  d: (t) => {
-    return 1000 * 60 * 60 * 24 * t;
-  },
+  m: (t) => 1000 * 60 * t,
+  h: (t) => 1000 * 60 * 60 * t,
+  d: (t) => 1000 * 60 * 60 * 24 * t,
 };

@@ -15,7 +15,7 @@ BarChartSummaryRangeInfo.propTypes = {
   loading: PropTypes.bool,
 };
 
-export default function BarChartSummaryRangeInfo({ title, subheader, chartLabels, chartData, loading, ...other }) {
+export default function BarChartSummaryRangeInfo({ title, subheader, chartData, loading, ...other }) {
   const columns = [
     {
       name: 'Pending',

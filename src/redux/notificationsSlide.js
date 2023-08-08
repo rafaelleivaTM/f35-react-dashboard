@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { faker } from '@faker-js/faker';
+import notificationsService from '../services/notificationsService';
 
 const initialState = [];
 
@@ -13,6 +14,9 @@ const notificationsSlice = createSlice({
     addNotification(state, action) {
       if (!action.payload.id) {
         action.payload.id = faker.datatype.uuid();
+      }
+      if (action.payload.isCritical) {
+        notificationsService.showCritical(action.payload.title, action.payload.description);
       }
       if (state.some((item) => item.id === action.payload.id)) {
         return;

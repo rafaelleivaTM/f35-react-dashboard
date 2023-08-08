@@ -44,86 +44,86 @@ export default function DashboardAppPage() {
 
   const [summaryEfficiencyCriteriaChartValue, setSummaryEfficiencyCriteriaChartValue] = useState('Effectiveness');
 
-  const fetchMissingOrdersBetweenBPAndF35 = async () => {
-    const response = await apiService.getMissingOrdersBetweenBPAndF35();
-    if (response.data) {
-      response.data.forEach((order) => {
-        const criticalNotification = {
-          id: order,
-          title: `Order ${order} is missing between BP and F35`,
-          description: 'The order is in BP in F35 status, but not in F35 tables',
-          avatar: null,
-          type: 'order_critical',
-          createdAt: new Date().toISOString(),
-          isUnRead: true,
-        };
-        dispatch(addNotification(criticalNotification));
-      });
-    }
-    console.log(`fetchMissingOrdersBetweenBPAndF35`, response);
-  };
-
-  const fetchSummaryEfficiency = async () => {
-    setLoadingSummaryEfficiency(true);
-    const response = await apiService.getRobotsSummaryEfficiencyByRange(dateRange.startDate, dateRange.endDate);
-    setLoadingSummaryEfficiency(false);
-    setSummaryEfficiency(response.data || {});
-    console.log(`fetchSummaryEfficiency`, response.data);
-  };
-
-  const fetchGeneralSummary = async () => {
-    setLoadingGeneralSummary(true);
-    const response = await apiService.getRobotsSummaryByRange(dateRange.startDate, dateRange.endDate);
-    setLoadingGeneralSummary(false);
-    setGeneralSummary(response.data);
-    console.log(`fetchGeneralSummary`, response);
-  };
-
-  const fetchRobotsStatsData = async () => {
-    setLoadingRobotsData(true);
-    const response = await apiService.getRobotsStats();
-    setLoadingRobotsData(false);
-    setRobotsData(response);
-    console.log(`fetchRobotsStatsData`, response);
-  };
-
-  const fetchRobotsErrorInfo = async () => {
-    setLoadingRobotsErrors(true);
-    const data = await apiService.getRobotsErrorInfo();
-    const errors = [];
-    ROBOTS.forEach((robot) => {
-      const robotErrorList = data[robot.name];
-      if (robotErrorList) {
-        robotErrorList.forEach((error) => {
-          errors.push({
-            id: faker.datatype.uuid(),
-            title: `${error.error.substring(0, 50)}...`,
-            description: error.error,
-            robotName: robot.name,
-            robotCode: robot.displayAvatarCode,
-            color: robot.color,
-            postedAt: faker.date.recent(),
-            count: error.count,
-          });
-        });
-      }
-    });
-    errors.sort((a, b) => b.count - a.count);
-    setLoadingRobotsErrors(false);
-    setRobotsErrorInfo(errors);
-    console.log(`fetchRobotsStatsData`, data);
-  };
-
   useEffect(() => {
+    const fetchGeneralSummary = async () => {
+      setLoadingGeneralSummary(true);
+      const response = await apiService.getRobotsSummaryByRange(dateRange.startDate, dateRange.endDate);
+      setLoadingGeneralSummary(false);
+      setGeneralSummary(response.data);
+      console.log(`fetchGeneralSummary`, response);
+    };
+
+    const fetchSummaryEfficiency = async () => {
+      setLoadingSummaryEfficiency(true);
+      const response = await apiService.getRobotsSummaryEfficiencyByRange(dateRange.startDate, dateRange.endDate);
+      setLoadingSummaryEfficiency(false);
+      setSummaryEfficiency(response.data || {});
+      console.log(`fetchSummaryEfficiency`, response.data);
+    };
+
     fetchGeneralSummary().then();
     fetchSummaryEfficiency().then();
   }, [dateRange]);
 
   useEffect(() => {
+    const fetchRobotsStatsData = async () => {
+      setLoadingRobotsData(true);
+      const response = await apiService.getRobotsStats();
+      setLoadingRobotsData(false);
+      setRobotsData(response);
+      console.log(`fetchRobotsStatsData`, response);
+    };
+
+    const fetchRobotsErrorInfo = async () => {
+      setLoadingRobotsErrors(true);
+      const data = await apiService.getRobotsErrorInfo();
+      const errors = [];
+      ROBOTS.forEach((robot) => {
+        const robotErrorList = data[robot.name];
+        if (robotErrorList) {
+          robotErrorList.forEach((error) => {
+            errors.push({
+              id: faker.datatype.uuid(),
+              title: `${error.error.substring(0, 50)}...`,
+              description: error.error,
+              robotName: robot.name,
+              robotCode: robot.displayAvatarCode,
+              color: robot.color,
+              postedAt: faker.date.recent(),
+              count: error.count,
+            });
+          });
+        }
+      });
+      errors.sort((a, b) => b.count - a.count);
+      setLoadingRobotsErrors(false);
+      setRobotsErrorInfo(errors);
+      console.log(`fetchRobotsStatsData`, data);
+    };
+
+    const fetchMissingOrdersBetweenBPAndF35 = async () => {
+      const response = await apiService.getMissingOrdersBetweenBPAndF35();
+      if (response.data) {
+        response.data.forEach((order) => {
+          const criticalNotification = {
+            id: order,
+            title: `Order ${order} is missing between BP and F35`,
+            description: 'The order is in BP in F35 status, but not in F35 tables',
+            avatar: null,
+            type: 'order_critical',
+            createdAt: new Date().toISOString(),
+            isUnRead: true,
+          };
+          dispatch(addNotification(criticalNotification));
+        });
+      }
+      console.log(`fetchMissingOrdersBetweenBPAndF35`, response);
+    };
+
     fetchRobotsStatsData().then();
     fetchRobotsErrorInfo().then();
     fetchMissingOrdersBetweenBPAndF35().then();
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
@@ -164,14 +164,12 @@ export default function DashboardAppPage() {
                 chartLabels={
                   summaryEfficiency && summaryEfficiency.DO ? summaryEfficiency?.DO.map((item) => item.date) : []
                 }
-                chartData={Object.keys(summaryEfficiency).map((key) => {
-                  return {
-                    name: key,
-                    type: 'line',
-                    fill: 'solid',
-                    data: summaryEfficiency[key].map((item) => item[summaryEfficiencyCriteriaChartValue]),
-                  };
-                })}
+                chartData={Object.keys(summaryEfficiency).map((key) => ({
+                  name: key,
+                  type: 'line',
+                  fill: 'solid',
+                  data: summaryEfficiency[key].map((item) => item[summaryEfficiencyCriteriaChartValue]),
+                }))}
                 criteria={summaryEfficiencyCriteriaChartValue}
                 loading={loadingSummaryEfficiency}
                 onCriteriaChange={(criteria) => setSummaryEfficiencyCriteriaChartValue(criteria)}

@@ -82,28 +82,26 @@ export default function LineChartsRobotsSummary({
     }
   };
 
-  const actions = () => {
-    return (
-      <Stack direction="row" spacing={1} alignItems={'center'}>
-        {loading ? <CircularProgress size={30} sx={{ mr: 1 }} /> : <></>}
-        <FormControl sx={{ minWidth: 120 }} size="small">
-          <Select
-            value={criteria}
-            onChange={(event) => handleChange(event)}
-            displayEmpty
-            inputProps={{ 'aria-label': 'Without label' }}
-          >
-            <MenuItem value={'Effectiveness'}>Effectiveness</MenuItem>
-            <MenuItem value={'Failed'}>Failed</MenuItem>
-            <MenuItem value={'Cancelled'}>Cancelled</MenuItem>
-            <MenuItem value={'Success'}>Success</MenuItem>
-            <MenuItem value={'Warning'}>Warning</MenuItem>
-            <MenuItem value={'Total'}>Total</MenuItem>
-          </Select>
-        </FormControl>
-      </Stack>
-    );
-  };
+  const actions = () => (
+    <Stack direction="row" spacing={1} alignItems={'center'}>
+      {loading ? <CircularProgress size={30} sx={{ mr: 1 }} /> : <></>}
+      <FormControl sx={{ minWidth: 120 }} size="small">
+        <Select
+          value={criteria}
+          onChange={(event) => handleChange(event)}
+          displayEmpty
+          inputProps={{ 'aria-label': 'Without label' }}
+        >
+          <MenuItem value={'Effectiveness'}>Effectiveness</MenuItem>
+          <MenuItem value={'Failed'}>Failed</MenuItem>
+          <MenuItem value={'Cancelled'}>Cancelled</MenuItem>
+          <MenuItem value={'Success'}>Success</MenuItem>
+          <MenuItem value={'Warning'}>Warning</MenuItem>
+          <MenuItem value={'Total'}>Total</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
+  );
 
   return (
     <Card {...other}>

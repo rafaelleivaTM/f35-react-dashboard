@@ -77,21 +77,17 @@ export default function Nav({ openNav, onCloseNav }) {
 
       <NavSection data={navConfig} />
 
-      <Box sx={{ flexGrow: 1 }} />
-
-      <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
-        <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ px: 2.5, pb: 3, flexGrow: 1 }}>
+        <Stack alignItems="center" spacing={3} sx={{ borderRadius: 2, position: 'relative' }}>
           <Box
             component="img"
-            src="/assets/illustrations/illustration_avatar.png"
-            sx={{ width: 100, position: 'absolute', top: -50 }}
+            src="/favicon/f35-plane.png"
+            sx={{
+              width: 130,
+              borderRadius: '50%',
+              objectFit: 'cover',
+            }}
           />
-
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography gutterBottom variant="h6">
-              Get more?
-            </Typography>
-          </Box>
         </Stack>
       </Box>
     </Scrollbar>
