@@ -5,7 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import { Container, Grid, Stack } from "@mui/material";
 // components
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Iconify from "../components/iconify";
 // sections
 import {
@@ -22,11 +22,13 @@ import {
 import apiService from "../services/apiService";
 import { ROBOTS, STATUS_COLORS } from "../utils/constants";
 import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
+import { addNotification } from "../redux/notificationsSlide";
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const dateRange = useSelector((state) => state.dateRange);
 
   const [robotsData, setRobotsData] = useState({});
@@ -44,6 +46,20 @@ export default function DashboardAppPage() {
 
   const fetchMissingOrdersBetweenBPAndF35 = async () => {
     const response = await apiService.getMissingOrdersBetweenBPAndF35();
+    if (response.data) {
+      response.data.forEach((order) => {
+        const criticalNotification = {
+          id: order,
+          title: `Order ${order} is missing between BP and F35`,
+          description: 'The order is in BP in F35 status, but not in F35 tables',
+          avatar: null,
+          type: 'order_critical',
+          createdAt: new Date().toISOString(),
+          isUnRead: true,
+        };
+        dispatch(addNotification(criticalNotification));
+      });
+    }
     console.log(`fetchMissingOrdersBetweenBPAndF35`, response);
   };
 
