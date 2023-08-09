@@ -2,12 +2,12 @@ import PropTypes from "prop-types";
 import ReactApexChart from "react-apexcharts";
 // @mui
 import { styled, useTheme } from "@mui/material/styles";
-import { Box, Card, CardActions, CardContent, CardHeader, LinearProgress, Stack, Typography } from "@mui/material";
 // utils
-import { Skeleton } from "@mui/lab";
+import { Box, Card, CardActions, CardContent, CardHeader, Skeleton } from "@mui/material";
 import { fNumber } from "../../../utils/formatNumber";
 // components
 import { useChart } from "../../../components/chart";
+import LinealProgressEffectiveness from "../../../components/LinealProgressEffectinevess/LinealProgressEffectiveness";
 
 // ----------------------------------------------------------------------
 
@@ -30,20 +30,6 @@ const StyledChartWrapper = styled('div')(() => ({
 }));
 
 // ----------------------------------------------------------------------
-LinearProgressWithLabel.propTypes = {
-  value: PropTypes.number.isRequired,
-};
-
-export const LinearProgressWithLabel = ({ value }) => (
-  <Box display="flex" alignItems="center" sx={{ flexGrow: 1 }}>
-    <Box width="100%" mr={1}>
-      <LinearProgress variant="determinate" />
-    </Box>
-    <Box minWidth={35}>
-      <Typography variant="body2" color="text.secondary">{`${Math.round(value)}%`}</Typography>
-    </Box>
-  </Box>
-);
 
 PieChartRobotStat.propTypes = {
   title: PropTypes.string,
@@ -106,12 +92,7 @@ export default function PieChartRobotStat({
             </StyledChartWrapper>
           </CardContent>
           <CardActions sx={{ width: '100%', px: 3 }}>
-            <Stack width={'100%'}>
-              <Typography variant="body2" color="text.secondary">
-                {`Effectiveness of ${total}`}
-              </Typography>
-              <LinearProgressWithLabel value={effectiveness} />
-            </Stack>
+            <LinealProgressEffectiveness total={total} value={effectiveness || 0} />
           </CardActions>
         </>
       )}

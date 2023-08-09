@@ -1,5 +1,5 @@
 // @mui
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import {
   Badge,
   Box,
@@ -10,14 +10,12 @@ import {
   Divider,
   Link,
   Stack,
-  Typography,
-} from '@mui/material';
-// utils
-import { fDateTime } from '../../../utils/formatTime';
-// components
-import Iconify from '../../../components/iconify';
-import Scrollbar from '../../../components/scrollbar';
-import LetterAvatar from '../../../components/letter-avatar';
+  Typography
+} from "@mui/material"; // utils
+import { fDateTime } from "../../../utils/formatTime"; // components
+import Iconify from "../../../components/iconify";
+import Scrollbar from "../../../components/scrollbar";
+import LetterAvatar from "../../../components/letter-avatar";
 
 // ----------------------------------------------------------------------
 
@@ -60,7 +58,7 @@ ErrorItem.propTypes = {
     robotCode: PropTypes.string,
     color: PropTypes.string,
     count: PropTypes.string,
-    postedAt: PropTypes.instanceOf(Date),
+    postedAt: PropTypes.string,
     title: PropTypes.string,
   }),
 };
@@ -86,7 +84,7 @@ function ErrorItem({ error }) {
       <Stack alignItems={'end'} spacing={2}>
         <Badge color={'error'} badgeContent={count} sx={{ mr: 3 }} />
         <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }} noWrap>
-          {fDateTime(postedAt)}
+          {fDateTime(new Date(postedAt))}
         </Typography>
       </Stack>
     </Stack>

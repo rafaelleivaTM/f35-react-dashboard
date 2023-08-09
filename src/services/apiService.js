@@ -1,8 +1,11 @@
+import { getDateFormatted } from '../utils/formatTime';
+
 const F35_API_URL = 'http://devtmia.com/f35/index';
 
 const apiService = {
-  getRobotsStats: async () => {
-    const response = await fetch(`${F35_API_URL}/getRobotsStats`);
+  getF35GeneralSummaryToday: async () => {
+    const date = getDateFormatted();
+    const response = await fetch(`${F35_API_URL}/getF35GeneralSummary?date=${date}`);
     return response.json();
   },
   getRobotsErrorInfo: async () => {

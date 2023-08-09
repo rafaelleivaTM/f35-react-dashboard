@@ -9,10 +9,9 @@ import Iconify from "../../../components/iconify";
 //
 import Searchbar from "./Searchbar";
 import AccountPopover from "./AccountPopover";
-import LanguagePopover from "./LanguagePopover";
 import NotificationsPopover from "./NotificationsPopover";
 import { DateRangePickerToolbar } from "./DateRangePickerToolbar";
-import SchedulerApiUpdater from "../../../components/scheduler_api_call/SchedulerApiUpdate";
+import CronRefreshStats from "../../../components/scheduler_api_call/CronRefreshStats";
 
 // ----------------------------------------------------------------------
 
@@ -70,11 +69,11 @@ export default function Header({ onOpenNav }) {
             sm: 1,
           }}
         >
-          <SchedulerApiUpdater />
+          <CronRefreshStats />
           <Divider orientation={'vertical'} variant={'middle'} flexItem />
           <DateRangePickerToolbar />
           <Divider orientation={'vertical'} variant={'middle'} flexItem />
-          <LanguagePopover />
+          {/* <LanguagePopover /> */}
           <NotificationsPopover />
           <AccountPopover />
         </Stack>

@@ -38,7 +38,7 @@ export const DateRangePickerToolbar = () => {
       appearance="subtle"
       value={dateRangeValue}
       onChange={(range) => onChangeRangeAction(range)}
-      disabledDate={afterToday()}
+      shouldDisableDate={afterToday()}
       // defaultValue={[new Date(dateRange.startDate), new Date(dateRange.endDate)]}
       defaultCalendarValue={[lastMonth, now]}
       cleanable={false}

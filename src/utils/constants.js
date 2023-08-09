@@ -44,18 +44,37 @@ export const ROBOTS = [
 ];
 
 export const STATUS_COLORS = [
-  'rgb(36,157,241)', // IN progress
-  'rgb(193,104,169)', // Pending
-  'rgb(248,157,157)', // Waiting Payment
-  'rgb(142,244,8)', // Manual
-  'rgba(153, 102, 255, 1)', // Cancelled
-  'rgba(255, 159, 64, 1)', // Warning
-  'rgb(27,157,114)', // Completed
-  'rgb(190,190,190)', // Blocked
+  'rgb(34,120,206)', // IN progress
+  'rgb(236,158,214)', // Pending
+  'rgb(247,10,10)', // Manual
+  'rgb(230,114,93)', // Cancelled
+  'rgb(236,216,136)', // Warning
+  'rgb(64,157,95)', // Completed
+  'rgb(149,149,153)', // Blocked
+  'rgba(62,61,61,0.33)', // Waiting Payment
 ];
 
 export const TIME_INTERVAL = {
   m: (t) => 1000 * 60 * t,
   h: (t) => 1000 * 60 * 60 * t,
   d: (t) => 1000 * 60 * 60 * 24 * t,
+};
+
+export const getScheduleCronInterval = (value) => {
+  let number;
+  let time;
+  const regex = /^\d+[mhd]$/;
+  try {
+    if (!regex.test(value)) {
+      throw new Error('Scheduler input is incorrect');
+    }
+    time = value.charAt(value.length - 1);
+    if (time !== 'm' && time !== 'h' && time !== 'd') throw new Error('Time is incorrect');
+    number = parseInt(value.substring(0, value.length - 1), 10);
+    if (Number.isNaN(number) || number === 0) throw new Error('Number is incorrect');
+
+    return TIME_INTERVAL[time](number);
+  } catch (e) {
+    return null;
+  }
 };

@@ -4,6 +4,7 @@ import ReactApexChart from "react-apexcharts";
 import { Box, Card, CardHeader, CircularProgress } from "@mui/material";
 // components
 import { useChart } from "../../../components/chart";
+import { STATUS_COLORS } from "../../../utils/constants";
 
 // ----------------------------------------------------------------------
 
@@ -18,24 +19,16 @@ BarChartSummaryRangeInfo.propTypes = {
 export default function BarChartSummaryRangeInfo({ title, subheader, chartData, loading, ...other }) {
   const columns = [
     {
-      name: 'Pending',
-      data: chartData.map((item) => item.pending),
-    },
-    {
-      name: 'Waiting Payment',
-      data: chartData.map((item) => item.waiting_payment),
-    },
-    {
       name: 'In Progress',
       data: chartData.map((item) => item.in_progress),
     },
     {
-      name: 'Failed',
-      data: chartData.map((item) => item.failed),
+      name: 'Pending',
+      data: chartData.map((item) => item.pending),
     },
     {
-      name: 'Custom Status',
-      data: chartData.map((item) => item.custom_status),
+      name: 'Failed',
+      data: chartData.map((item) => item.failed),
     },
     {
       name: 'Cancelled',
@@ -48,6 +41,14 @@ export default function BarChartSummaryRangeInfo({ title, subheader, chartData, 
     {
       name: 'Success',
       data: chartData.map((item) => item.success),
+    },
+    {
+      name: 'Custom Status',
+      data: chartData.map((item) => item.custom_status),
+    },
+    {
+      name: 'Waiting Payment',
+      data: chartData.map((item) => item.waiting_payment),
     },
   ];
   const categories = chartData.map((item) => item.date);
@@ -62,6 +63,7 @@ export default function BarChartSummaryRangeInfo({ title, subheader, chartData, 
         enabled: true,
       },
     },
+    colors: STATUS_COLORS,
     plotOptions: {
       bar: {
         horizontal: false,

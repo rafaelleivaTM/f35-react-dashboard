@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import { faker } from "@faker-js/faker";
 // @mui
 import { Container, Grid, Stack } from "@mui/material";
 // components
@@ -16,10 +15,10 @@ import {
   PieChartRobotStat
 } from "../sections/@dashboard/app";
 import apiService from "../services/apiService";
-import { ROBOTS, STATUS_COLORS } from "../utils/constants";
+import { STATUS_COLORS } from "../utils/constants";
 import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
 import { addNotification } from "../redux/notificationsSlide";
-import { getDateFormatted } from "../utils/formatTime";
+import { fetchF35ChartsDataForToday } from "../services/apiCalls";
 
 // ----------------------------------------------------------------------
 
@@ -27,88 +26,54 @@ export default function DashboardAppPage() {
   const dispatch = useDispatch();
   const dateRange = useSelector((state) => state.dateRange);
 
-  const [robotsData, setRobotsData] = useState({});
-  const [loadingRobotsData, setLoadingRobotsData] = useState(false);
-  const [robotsErrorInfo, setRobotsErrorInfo] = useState([]);
-  const [loadingRobotsErrors, setLoadingRobotsErrors] = useState(false);
+  const [generalSummaryByRange, setGeneralSummaryByRange] = useState([]);
+  const [loadingGeneralSummaryByRange, setLoadingGeneralSummaryByRange] = useState(false);
 
-  const [generalSummary, setGeneralSummary] = useState([]);
-  const [loadingGeneralSummary, setLoadingGeneralSummary] = useState(false);
+  const [summaryEfficiencyByRange, setSummaryEfficiencyByRange] = useState({});
+  const [loadingSummaryEfficiencyByRange, setLoadingSummaryEfficiencyByRange] = useState(false);
 
-  const [summaryEfficiency, setSummaryEfficiency] = useState({});
-  const [loadingSummaryEfficiency, setLoadingSummaryEfficiency] = useState(false);
+  const f35SummaryStats = useSelector((state) => state.todayStats.f35SummaryStats);
+  const loadingF35SummaryStats = useSelector((state) => state.todayStats.loadingF35SummaryStats);
 
-  const [doSummaryStats, setDoSummaryStats] = useState({});
-  const [loadingDoSummaryStats, setLoadingDoSummaryStats] = useState(false);
+  const robotsErrorInfo = useSelector((state) => state.todayStats.robotsErrorInfo);
+  const loadingRobotsErrors = useSelector((state) => state.todayStats.loadingRobotsErrors);
 
-  const [zincSummaryStats, setZincSummaryStats] = useState({});
-  const [loadingZincSummaryStats, setLoadingZincSummaryStats] = useState(false);
+  const doSummaryStats = useSelector((state) => state.todayStats.doSummaryStats);
+  const loadingDoSummaryStats = useSelector((state) => state.todayStats.loadingDoSummaryStats);
 
-  const [ebaySummaryStats, setEbaySummaryStats] = useState({});
-  const [loadingEbaySummaryStats, setLoadingEbaySummaryStats] = useState(false);
+  const zincSummaryStats = useSelector((state) => state.todayStats.zincSummaryStats);
+  const loadingZincSummaryStats = useSelector((state) => state.todayStats.loadingZincSummaryStats);
 
-  const [miraSummaryStats, setMiraSummaryStats] = useState({});
-  const [loadingMiraSummaryStats, setLoadingMiraSummaryStats] = useState(false);
+  const ebaySummaryStats = useSelector((state) => state.todayStats.ebaySummaryStats);
+  const loadingEbaySummaryStats = useSelector((state) => state.todayStats.loadingEbaySummaryStats);
+
+  const miraSummaryStats = useSelector((state) => state.todayStats.miraSummaryStats);
+  const loadingMiraSummaryStats = useSelector((state) => state.todayStats.loadingMiraSummaryStats);
 
   const [summaryEfficiencyCriteriaChartValue, setSummaryEfficiencyCriteriaChartValue] = useState('Effectiveness');
 
   useEffect(() => {
-    const fetchGeneralSummary = async () => {
-      setLoadingGeneralSummary(true);
+    const fetchGeneralSummaryByRange = async () => {
+      setLoadingGeneralSummaryByRange(true);
       const response = await apiService.getRobotsSummaryByRange(dateRange.startDate, dateRange.endDate);
-      setLoadingGeneralSummary(false);
-      setGeneralSummary(response.data);
-      console.log(`fetchGeneralSummary`, response);
+      setLoadingGeneralSummaryByRange(false);
+      setGeneralSummaryByRange(response.data);
+      console.log(`fetchGeneralSummaryByRange`, response);
     };
 
-    const fetchSummaryEfficiency = async () => {
-      setLoadingSummaryEfficiency(true);
+    const fetchSummaryEfficiencyByRange = async () => {
+      setLoadingSummaryEfficiencyByRange(true);
       const response = await apiService.getRobotsSummaryEfficiencyByRange(dateRange.startDate, dateRange.endDate);
-      setLoadingSummaryEfficiency(false);
-      setSummaryEfficiency(response.data || {});
-      console.log(`fetchSummaryEfficiency`, response.data);
+      setLoadingSummaryEfficiencyByRange(false);
+      setSummaryEfficiencyByRange(response.data || {});
+      console.log(`fetchSummaryEfficiencyByRange`, response.data);
     };
 
-    fetchGeneralSummary().then();
-    fetchSummaryEfficiency().then();
+    fetchGeneralSummaryByRange().then();
+    fetchSummaryEfficiencyByRange().then();
   }, [dateRange]);
 
   useEffect(() => {
-    const fetchRobotsStatsData = async () => {
-      setLoadingRobotsData(true);
-      const response = await apiService.getRobotsStats();
-      setLoadingRobotsData(false);
-      setRobotsData(response);
-      console.log(`fetchRobotsStatsData`, response);
-    };
-
-    const fetchRobotsErrorInfo = async () => {
-      setLoadingRobotsErrors(true);
-      const data = await apiService.getRobotsErrorInfo();
-      const errors = [];
-      ROBOTS.forEach((robot) => {
-        const robotErrorList = data[robot.name];
-        if (robotErrorList) {
-          robotErrorList.forEach((error) => {
-            errors.push({
-              id: faker.datatype.uuid(),
-              title: `${error.error.substring(0, 50)}...`,
-              description: error.error,
-              robotName: robot.name,
-              robotCode: robot.displayAvatarCode,
-              color: robot.color,
-              postedAt: faker.date.recent(),
-              count: error.count,
-            });
-          });
-        }
-      });
-      errors.sort((a, b) => b.count - a.count);
-      setLoadingRobotsErrors(false);
-      setRobotsErrorInfo(errors);
-      console.log(`fetchRobotsStatsData`, data);
-    };
-
     const fetchMissingOrdersBetweenBPAndF35 = async () => {
       const response = await apiService.getMissingOrdersBetweenBPAndF35();
       if (response.data) {
@@ -128,46 +93,14 @@ export default function DashboardAppPage() {
       console.log(`fetchMissingOrdersBetweenBPAndF35`, response);
     };
 
-    const fetchDOOrdersStats = async () => {
-      setLoadingDoSummaryStats(true);
-      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'DO');
-      setLoadingDoSummaryStats(false);
-      setDoSummaryStats(response?.data?.[0] || {});
-      console.log(`fetchDOOrdersStats`, response);
-    };
-
-    const fetchZincOrdersStats = async () => {
-      setLoadingZincSummaryStats(true);
-      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'Zinc');
-      setLoadingZincSummaryStats(false);
-      setZincSummaryStats(response?.data?.[0] || {});
-      console.log(`fetchZincOrdersStats`, response);
-    };
-
-    const fetchEbayOrdersStats = async () => {
-      setLoadingEbaySummaryStats(true);
-      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'Ebay');
-      setLoadingEbaySummaryStats(false);
-      setEbaySummaryStats(response?.data?.[0] || {});
-      console.log(`fetchEbayOrdersStats`, response);
-    };
-
-    const fetchMiraOrdersStats = async () => {
-      setLoadingMiraSummaryStats(true);
-      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'Mira');
-      setLoadingMiraSummaryStats(false);
-      setMiraSummaryStats(response?.data?.[0] || {});
-      console.log(`fetchMiraOrdersStats`, response);
-    };
-
-    fetchRobotsStatsData().then();
-    fetchRobotsErrorInfo().then();
     fetchMissingOrdersBetweenBPAndF35().then();
-    fetchDOOrdersStats().then();
-    fetchZincOrdersStats().then();
-    fetchEbayOrdersStats().then();
-    fetchMiraOrdersStats().then();
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!f35SummaryStats || Object.keys(f35SummaryStats).length === 0) {
+      fetchF35ChartsDataForToday(dispatch).then();
+    }
+  }, [dispatch, f35SummaryStats]);
 
   return (
     <>
@@ -198,24 +131,26 @@ export default function DashboardAppPage() {
               <BarChartSummaryRangeInfo
                 title="Summary by range"
                 subheader={`From ${dateRange.startDate} to ${dateRange.endDate}`}
-                chartData={generalSummary}
-                loading={loadingGeneralSummary}
+                chartData={generalSummaryByRange}
+                loading={loadingGeneralSummaryByRange}
               />
 
               <LineChartsRobotsSummary
                 title="Robots summary"
                 subheader="Select a criteria to see the summary"
                 chartLabels={
-                  summaryEfficiency && summaryEfficiency.DO ? summaryEfficiency?.DO.map((item) => item.date) : []
+                  summaryEfficiencyByRange && summaryEfficiencyByRange.DO
+                    ? summaryEfficiencyByRange?.DO.map((item) => item.date)
+                    : []
                 }
-                chartData={Object.keys(summaryEfficiency).map((key) => ({
+                chartData={Object.keys(summaryEfficiencyByRange).map((key) => ({
                   name: key,
                   type: 'line',
                   fill: 'solid',
-                  data: summaryEfficiency[key].map((item) => item[summaryEfficiencyCriteriaChartValue]),
+                  data: summaryEfficiencyByRange[key].map((item) => item[summaryEfficiencyCriteriaChartValue]),
                 }))}
                 criteria={summaryEfficiencyCriteriaChartValue}
-                loading={loadingSummaryEfficiency}
+                loading={loadingSummaryEfficiencyByRange}
                 onCriteriaChange={(criteria) => setSummaryEfficiencyCriteriaChartValue(criteria)}
               />
 
@@ -255,22 +190,20 @@ export default function DashboardAppPage() {
             <Stack spacing={2}>
               <DonutChartPanel
                 title="F35 Summary"
-                total={parseInt(robotsData?.stats?.summary?.total, 10) || 0}
-                loading={loadingRobotsData}
+                total={parseInt(f35SummaryStats?.total, 10) || 0}
+                effectiveness={parseInt(f35SummaryStats?.overall_effectiveness, 10) || 0}
+                loading={loadingF35SummaryStats}
                 chartData={[
-                  { label: 'In Progress', value: parseInt(robotsData?.stats?.summary?.inProgress, 10) || 0 },
-                  { label: 'Pending', value: parseInt(robotsData?.stats?.summary?.pending, 10) || 0 },
-                  { label: 'Waiting Payment', value: parseInt(robotsData?.stats?.summary?.waitingPayment, 10) || 0 },
-                  { label: 'Manual', value: parseInt(robotsData?.stats?.summary?.manual, 10) || 0 },
-                  { label: 'Cancelled', value: parseInt(robotsData?.stats?.summary?.cancelled, 10) || 0 },
-                  { label: 'Warning', value: parseInt(robotsData?.stats?.summary?.warning, 10) || 0 },
-                  { label: 'Purchased', value: parseInt(robotsData?.stats?.summary?.purchased, 10) || 0 },
+                  { label: 'In Progress', value: parseInt(f35SummaryStats?.InProgress, 10) || 0 },
+                  { label: 'Pending', value: parseInt(f35SummaryStats?.Pending, 10) || 0 },
+                  { label: 'Manual', value: parseInt(f35SummaryStats?.Manual, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(f35SummaryStats?.Cancelled, 10) || 0 },
+                  { label: 'Warning', value: parseInt(f35SummaryStats?.Warning, 10) || 0 },
+                  { label: 'Purchased', value: parseInt(f35SummaryStats?.Success, 10) || 0 },
+                  { label: 'DevBlocked', value: parseInt(f35SummaryStats?.DevBlocked, 10) || 0 },
                   {
-                    label: 'Blocked',
-                    value:
-                      parseInt(robotsData?.stats?.summary?.blocked, 10) || robotsData?.stats?.summary === undefined
-                        ? 1
-                        : 0,
+                    label: 'Waiting Payment',
+                    value: parseInt(f35SummaryStats?.Waiting_payment, 10) || 0,
                   },
                 ]}
                 chartColors={STATUS_COLORS}
@@ -281,7 +214,7 @@ export default function DashboardAppPage() {
                 total={parseInt(doSummaryStats?.Total, 10) || 0}
                 effectiveness={parseInt(doSummaryStats?.Effectiveness, 10) || 0}
                 chartData={[
-                  { label: 'In Progress', value: parseInt(doSummaryStats?.inProgress, 10) || 0 },
+                  { label: 'In Progress', value: parseInt(doSummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(doSummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(doSummaryStats?.Failed, 10) || 0 },
                   { label: 'Cancelled', value: parseInt(doSummaryStats.Cancelled, 10) || 0 },
@@ -298,7 +231,7 @@ export default function DashboardAppPage() {
                 total={parseInt(zincSummaryStats?.Total, 10) || 0}
                 effectiveness={parseInt(zincSummaryStats?.Effectiveness, 10) || 0}
                 chartData={[
-                  { label: 'In Progress', value: parseInt(zincSummaryStats?.inProgress, 10) || 0 },
+                  { label: 'In Progress', value: parseInt(zincSummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(zincSummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(zincSummaryStats?.Failed, 10) || 0 },
                   { label: 'Cancelled', value: parseInt(zincSummaryStats.Cancelled, 10) || 0 },
@@ -315,7 +248,7 @@ export default function DashboardAppPage() {
                 total={parseInt(ebaySummaryStats?.Total, 10) || 0}
                 effectiveness={parseInt(ebaySummaryStats?.Effectiveness, 10) || 0}
                 chartData={[
-                  { label: 'In Progress', value: parseInt(ebaySummaryStats?.inProgress, 10) || 0 },
+                  { label: 'In Progress', value: parseInt(ebaySummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(ebaySummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(ebaySummaryStats?.Failed, 10) || 0 },
                   { label: 'Cancelled', value: parseInt(ebaySummaryStats.Cancelled, 10) || 0 },
@@ -332,7 +265,7 @@ export default function DashboardAppPage() {
                 total={parseInt(miraSummaryStats?.Total, 10) || 0}
                 effectiveness={parseInt(miraSummaryStats?.Effectiveness, 10) || 0}
                 chartData={[
-                  { label: 'In Progress', value: parseInt(miraSummaryStats?.inProgress, 10) || 0 },
+                  { label: 'In Progress', value: parseInt(miraSummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(miraSummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(miraSummaryStats?.Failed, 10) || 0 },
                   { label: 'Cancelled', value: parseInt(miraSummaryStats.Cancelled, 10) || 0 },
