@@ -21,6 +21,10 @@ const apiService = {
     const response = await fetch(`${F35_API_URL}/checkMissingOrdersBetweenBPAndF35`);
     return response.json();
   },
+  getSummaryEfficiencyByRobot: async (date, robot) => {
+    const response = await fetch(`${F35_API_URL}/getSummaryEfficiencyByRobot?date=${date}&robot=${robot}`);
+    return response.json();
+  },
 };
 
 export default apiService;

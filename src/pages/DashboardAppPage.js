@@ -1,33 +1,29 @@
 import { Helmet } from "react-helmet-async";
 import { faker } from "@faker-js/faker";
 // @mui
-import { useTheme } from "@mui/material/styles";
 import { Container, Grid, Stack } from "@mui/material";
 // components
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Iconify from "../components/iconify";
 // sections
 import {
   AppConversionRates,
-  AppCurrentSubject,
   AppErrorList,
-  AppOrderTimeline,
   AppTasks,
-  AppTrafficBySite,
   AppWidgetSummary,
   DonutChartPanel,
-  LineChartsRobotsSummary
+  LineChartsRobotsSummary,
+  PieChartRobotStat
 } from "../sections/@dashboard/app";
 import apiService from "../services/apiService";
 import { ROBOTS, STATUS_COLORS } from "../utils/constants";
 import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
 import { addNotification } from "../redux/notificationsSlide";
+import { getDateFormatted } from "../utils/formatTime";
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
-  const theme = useTheme();
   const dispatch = useDispatch();
   const dateRange = useSelector((state) => state.dateRange);
 
@@ -41,6 +37,18 @@ export default function DashboardAppPage() {
 
   const [summaryEfficiency, setSummaryEfficiency] = useState({});
   const [loadingSummaryEfficiency, setLoadingSummaryEfficiency] = useState(false);
+
+  const [doSummaryStats, setDoSummaryStats] = useState({});
+  const [loadingDoSummaryStats, setLoadingDoSummaryStats] = useState(false);
+
+  const [zincSummaryStats, setZincSummaryStats] = useState({});
+  const [loadingZincSummaryStats, setLoadingZincSummaryStats] = useState(false);
+
+  const [ebaySummaryStats, setEbaySummaryStats] = useState({});
+  const [loadingEbaySummaryStats, setLoadingEbaySummaryStats] = useState(false);
+
+  const [miraSummaryStats, setMiraSummaryStats] = useState({});
+  const [loadingMiraSummaryStats, setLoadingMiraSummaryStats] = useState(false);
 
   const [summaryEfficiencyCriteriaChartValue, setSummaryEfficiencyCriteriaChartValue] = useState('Effectiveness');
 
@@ -120,9 +128,45 @@ export default function DashboardAppPage() {
       console.log(`fetchMissingOrdersBetweenBPAndF35`, response);
     };
 
+    const fetchDOOrdersStats = async () => {
+      setLoadingDoSummaryStats(true);
+      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'DO');
+      setLoadingDoSummaryStats(false);
+      setDoSummaryStats(response?.data?.[0] || {});
+      console.log(`fetchDOOrdersStats`, response);
+    };
+
+    const fetchZincOrdersStats = async () => {
+      setLoadingZincSummaryStats(true);
+      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'Zinc');
+      setLoadingZincSummaryStats(false);
+      setZincSummaryStats(response?.data?.[0] || {});
+      console.log(`fetchZincOrdersStats`, response);
+    };
+
+    const fetchEbayOrdersStats = async () => {
+      setLoadingEbaySummaryStats(true);
+      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'Ebay');
+      setLoadingEbaySummaryStats(false);
+      setEbaySummaryStats(response?.data?.[0] || {});
+      console.log(`fetchEbayOrdersStats`, response);
+    };
+
+    const fetchMiraOrdersStats = async () => {
+      setLoadingMiraSummaryStats(true);
+      const response = await apiService.getSummaryEfficiencyByRobot(getDateFormatted(), 'Mira');
+      setLoadingMiraSummaryStats(false);
+      setMiraSummaryStats(response?.data?.[0] || {});
+      console.log(`fetchMiraOrdersStats`, response);
+    };
+
     fetchRobotsStatsData().then();
     fetchRobotsErrorInfo().then();
     fetchMissingOrdersBetweenBPAndF35().then();
+    fetchDOOrdersStats().then();
+    fetchZincOrdersStats().then();
+    fetchEbayOrdersStats().then();
+    fetchMiraOrdersStats().then();
   }, [dispatch]);
 
   return (
@@ -208,7 +252,7 @@ export default function DashboardAppPage() {
           </Grid>
 
           <Grid item xs={12} md={4} lg={3}>
-            <Stack spacing={3}>
+            <Stack spacing={2}>
               <DonutChartPanel
                 title="F35 Summary"
                 total={parseInt(robotsData?.stats?.summary?.total, 10) || 0}
@@ -232,58 +276,126 @@ export default function DashboardAppPage() {
                 chartColors={STATUS_COLORS}
               />
 
-              <AppCurrentSubject
-                title="Current Subject"
-                chartLabels={['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math']}
+              <PieChartRobotStat
+                title="DO today"
+                total={parseInt(doSummaryStats?.Total, 10) || 0}
+                effectiveness={parseInt(doSummaryStats?.Effectiveness, 10) || 0}
                 chartData={[
-                  { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
-                  { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
-                  { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
+                  { label: 'In Progress', value: parseInt(doSummaryStats?.inProgress, 10) || 0 },
+                  { label: 'Pending', value: parseInt(doSummaryStats?.Pending, 10) || 0 },
+                  { label: 'Failed', value: parseInt(doSummaryStats?.Failed, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(doSummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Warning', value: parseInt(doSummaryStats?.Warning, 10) || 0 },
+                  { label: 'Success', value: parseInt(doSummaryStats?.Success, 10) || 0 },
+                  { label: 'DevBlocked', value: parseInt(doSummaryStats?.DevBlocked, 10) || 0 },
                 ]}
-                chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
+                chartColors={STATUS_COLORS}
+                loading={loadingDoSummaryStats}
               />
 
-              <AppOrderTimeline
-                title="Order Timeline"
-                list={[...Array(5)].map((_, index) => ({
-                  id: faker.datatype.uuid(),
-                  title: [
-                    '1983, orders, $4220',
-                    '12 Invoices have been paid',
-                    'Order #37745 from September',
-                    'New order placed #XF-2356',
-                    'New order placed #XF-2346',
-                  ][index],
-                  type: `order${index + 1}`,
-                  time: faker.date.past(),
-                }))}
+              <PieChartRobotStat
+                title="Zinc today"
+                total={parseInt(zincSummaryStats?.Total, 10) || 0}
+                effectiveness={parseInt(zincSummaryStats?.Effectiveness, 10) || 0}
+                chartData={[
+                  { label: 'In Progress', value: parseInt(zincSummaryStats?.inProgress, 10) || 0 },
+                  { label: 'Pending', value: parseInt(zincSummaryStats?.Pending, 10) || 0 },
+                  { label: 'Failed', value: parseInt(zincSummaryStats?.Failed, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(zincSummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Warning', value: parseInt(zincSummaryStats?.Warning, 10) || 0 },
+                  { label: 'Success', value: parseInt(zincSummaryStats?.Success, 10) || 0 },
+                  { label: 'DevBlocked', value: parseInt(zincSummaryStats?.DevBlocked, 10) || 0 },
+                ]}
+                chartColors={STATUS_COLORS}
+                loading={loadingZincSummaryStats}
               />
 
-              <AppTrafficBySite
-                title="Traffic by Site"
-                list={[
-                  {
-                    name: 'FaceBook',
-                    value: 323234,
-                    icon: <Iconify icon={'eva:facebook-fill'} color="#1877F2" width={32} />,
-                  },
-                  {
-                    name: 'Google',
-                    value: 341212,
-                    icon: <Iconify icon={'eva:google-fill'} color="#DF3E30" width={32} />,
-                  },
-                  {
-                    name: 'Linkedin',
-                    value: 411213,
-                    icon: <Iconify icon={'eva:linkedin-fill'} color="#006097" width={32} />,
-                  },
-                  {
-                    name: 'Twitter',
-                    value: 443232,
-                    icon: <Iconify icon={'eva:twitter-fill'} color="#1C9CEA" width={32} />,
-                  },
+              <PieChartRobotStat
+                title="Ebay today"
+                total={parseInt(ebaySummaryStats?.Total, 10) || 0}
+                effectiveness={parseInt(ebaySummaryStats?.Effectiveness, 10) || 0}
+                chartData={[
+                  { label: 'In Progress', value: parseInt(ebaySummaryStats?.inProgress, 10) || 0 },
+                  { label: 'Pending', value: parseInt(ebaySummaryStats?.Pending, 10) || 0 },
+                  { label: 'Failed', value: parseInt(ebaySummaryStats?.Failed, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(ebaySummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Warning', value: parseInt(ebaySummaryStats?.Warning, 10) || 0 },
+                  { label: 'Success', value: parseInt(ebaySummaryStats?.Success, 10) || 0 },
+                  { label: 'DevBlocked', value: parseInt(ebaySummaryStats?.DevBlocked, 10) || 0 },
                 ]}
+                chartColors={STATUS_COLORS}
+                loading={loadingEbaySummaryStats}
               />
+
+              <PieChartRobotStat
+                title="Mira today"
+                total={parseInt(miraSummaryStats?.Total, 10) || 0}
+                effectiveness={parseInt(miraSummaryStats?.Effectiveness, 10) || 0}
+                chartData={[
+                  { label: 'In Progress', value: parseInt(miraSummaryStats?.inProgress, 10) || 0 },
+                  { label: 'Pending', value: parseInt(miraSummaryStats?.Pending, 10) || 0 },
+                  { label: 'Failed', value: parseInt(miraSummaryStats?.Failed, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(miraSummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Warning', value: parseInt(miraSummaryStats?.Warning, 10) || 0 },
+                  { label: 'Success', value: parseInt(miraSummaryStats?.Success, 10) || 0 },
+                  { label: 'DevBlocked', value: parseInt(miraSummaryStats?.DevBlocked, 10) || 0 },
+                ]}
+                chartColors={STATUS_COLORS}
+                loading={loadingMiraSummaryStats}
+              />
+
+              {/* <AppCurrentSubject */}
+              {/*  title="Current Subject" */}
+              {/*  chartLabels={['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math']} */}
+              {/*  chartData={[ */}
+              {/*    { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] }, */}
+              {/*    { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] }, */}
+              {/*    { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] }, */}
+              {/*  ]} */}
+              {/*  chartColors={[...Array(6)].map(() => theme.palette.text.secondary)} */}
+              {/* /> */}
+
+              {/* <AppOrderTimeline */}
+              {/*  title="Order Timeline" */}
+              {/*  list={[...Array(5)].map((_, index) => ({ */}
+              {/*    id: faker.datatype.uuid(), */}
+              {/*    title: [ */}
+              {/*      '1983, orders, $4220', */}
+              {/*      '12 Invoices have been paid', */}
+              {/*      'Order #37745 from September', */}
+              {/*      'New order placed #XF-2356', */}
+              {/*      'New order placed #XF-2346', */}
+              {/*    ][index], */}
+              {/*    type: `order${index + 1}`, */}
+              {/*    time: faker.date.past(), */}
+              {/*  }))} */}
+              {/* /> */}
+
+              {/* <AppTrafficBySite */}
+              {/*  title="Traffic by Site" */}
+              {/*  list={[ */}
+              {/*    { */}
+              {/*      name: 'FaceBook', */}
+              {/*      value: 323234, */}
+              {/*      icon: <Iconify icon={'eva:facebook-fill'} color="#1877F2" width={32} />, */}
+              {/*    }, */}
+              {/*    { */}
+              {/*      name: 'Google', */}
+              {/*      value: 341212, */}
+              {/*      icon: <Iconify icon={'eva:google-fill'} color="#DF3E30" width={32} />, */}
+              {/*    }, */}
+              {/*    { */}
+              {/*      name: 'Linkedin', */}
+              {/*      value: 411213, */}
+              {/*      icon: <Iconify icon={'eva:linkedin-fill'} color="#006097" width={32} />, */}
+              {/*    }, */}
+              {/*    { */}
+              {/*      name: 'Twitter', */}
+              {/*      value: 443232, */}
+              {/*      icon: <Iconify icon={'eva:twitter-fill'} color="#1C9CEA" width={32} />, */}
+              {/*    }, */}
+              {/*  ]} */}
+              {/* /> */}
             </Stack>
           </Grid>
         </Grid>
