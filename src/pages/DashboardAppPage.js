@@ -17,7 +17,7 @@ import {
 import apiService from "../services/apiService";
 import { STATUS_COLORS } from "../utils/constants";
 import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
-import { addNotification } from "../redux/notificationsSlide";
+import { addNotification } from "../redux/notificationsSlice";
 import { fetchF35ChartsDataForToday } from "../services/apiCalls";
 
 // ----------------------------------------------------------------------

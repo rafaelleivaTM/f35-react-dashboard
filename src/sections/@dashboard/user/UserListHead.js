@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // @mui
-import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel } from '@mui/material';
+import { Box, TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
 
 // ----------------------------------------------------------------------
 
@@ -42,13 +42,13 @@ export default function UserListHead({
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-          />
-        </TableCell>
+        {/* <TableCell padding="checkbox"> */}
+        {/*  <Checkbox */}
+        {/*    indeterminate={numSelected > 0 && numSelected < rowCount} */}
+        {/*    checked={rowCount > 0 && numSelected === rowCount} */}
+        {/*    onChange={onSelectAllClick} */}
+        {/*  /> */}
+        {/* </TableCell> */}
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}

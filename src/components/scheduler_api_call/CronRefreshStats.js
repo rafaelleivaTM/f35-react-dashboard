@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import Iconify from '../iconify';
 import { getScheduleCronInterval } from '../../utils/constants';
-import { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus } from '../../redux/appConfigSlide';
+import { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus } from '../../redux/appConfigSlice';
 import {
   fetchDOOrdersStats,
   fetchEbayOrdersStats,

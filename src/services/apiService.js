@@ -28,6 +28,14 @@ const apiService = {
     const response = await fetch(`${F35_API_URL}/getSummaryEfficiencyByRobot?date=${date}&robot=${robot}`);
     return response.json();
   },
+  searchOrdersInF35: async (orders, filter) => {
+    const queryParams = new URLSearchParams();
+    queryParams.append('filter', JSON.stringify(filter));
+    queryParams.append('orders', orders.join(','));
+    const url = `${F35_API_URL}/searchOrdersInfo?${queryParams}`;
+    const response = await fetch(url);
+    return response.json();
+  },
 };
 
 export default apiService;

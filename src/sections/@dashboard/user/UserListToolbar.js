@@ -1,9 +1,13 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // @mui
-import { styled, alpha } from '@mui/material/styles';
-import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment } from '@mui/material';
+import { alpha, styled } from "@mui/material/styles";
+import { IconButton, InputAdornment, OutlinedInput, Toolbar, Tooltip, Typography } from "@mui/material";
 // component
-import Iconify from '../../../components/iconify';
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Iconify from "../../../components/iconify";
+import { parseSearchInput } from "../../../utils/functionsUtils";
+import { searchOrdersUpdated } from "../../../redux/searchOrdersSlice";
 
 // ----------------------------------------------------------------------
 
@@ -14,14 +18,15 @@ const StyledRoot = styled(Toolbar)(({ theme }) => ({
   padding: theme.spacing(0, 1, 0, 3),
 }));
 
-const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
-  width: 240,
+const StyledSearch = styled(OutlinedInput)(({ theme, hasValue }) => ({
+  width: hasValue ? '100%' : 240,
+  marginRight: theme.spacing(3),
   transition: theme.transitions.create(['box-shadow', 'width'], {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shorter,
   }),
   '&.Mui-focused': {
-    width: 320,
+    width: '100%',
     boxShadow: theme.customShadows.z8,
   },
   '& fieldset': {
@@ -39,6 +44,27 @@ UserListToolbar.propTypes = {
 };
 
 export default function UserListToolbar({ numSelected, filterName, onFilterName }) {
+  const inputRef = useRef();
+  const dispatch = useDispatch();
+
+  const searchOrders = useSelector((state) => state.searchOrders.orders);
+  const filter = useSelector((state) => state.searchOrders.filter);
+
+  useEffect(() => {
+    onFilterName(searchOrders, filter);
+  }, [searchOrders]);
+  const onChangeInputSearchValue = (event) => {
+    if (event.target.value === '') {
+      dispatch(searchOrdersUpdated([]));
+      inputRef.current.querySelector('input').blur();
+    } else {
+      const orders = parseSearchInput(event.target.value);
+      dispatch(searchOrdersUpdated(orders));
+      onFilterName(orders, filter);
+      inputRef.current.focus();
+    }
+  };
+
   return (
     <StyledRoot
       sx={{
@@ -54,9 +80,11 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
         </Typography>
       ) : (
         <StyledSearch
-          value={filterName}
-          onChange={onFilterName}
-          placeholder="Search user..."
+          value={searchOrders.join(',')}
+          ref={inputRef}
+          onChange={onChangeInputSearchValue}
+          placeholder="Search orders..."
+          hasValue={searchOrders.length > 0}
           startAdornment={
             <InputAdornment position="start">
               <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />

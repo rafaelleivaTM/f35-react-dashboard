@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import dateRangeReducer from './dateRangeSlide';
-import notificationsReducer from './notificationsSlide';
-import appConfigReducer from './appConfigSlide';
-import todayStatsReducer from './todayStatsSlide';
+import dateRangeReducer from './dateRangeSlice';
+import notificationsReducer from './notificationsSlice';
+import appConfigReducer from './appConfigSlice';
+import todayStatsReducer from './todayStatsSlice';
+import searchOrdersReducer from './searchOrdersSlice';
 
 export default configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export default configureStore({
     notifications: notificationsReducer,
     appConfig: appConfigReducer,
     todayStats: todayStatsReducer,
+    searchOrders: searchOrdersReducer,
   },
 });

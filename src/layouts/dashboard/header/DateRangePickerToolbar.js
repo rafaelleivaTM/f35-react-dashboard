@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { DateRangePicker } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { dateRangeUpdated } from '../../../redux/dateRangeSlide';
+import { dateRangeUpdated } from '../../../redux/dateRangeSlice';
 import { getDateFormatted } from '../../../utils/formatTime';
 
 export const DateRangePickerToolbar = () => {

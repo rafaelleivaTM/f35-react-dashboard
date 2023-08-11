@@ -22,7 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fToNow } from "../../../utils/formatTime"; // components
 import Iconify from "../../../components/iconify";
 import Scrollbar from "../../../components/scrollbar";
-import { notificationsUpdated } from "../../../redux/notificationsSlide";
+import { notificationsUpdated } from "../../../redux/notificationsSlice";
 
 // ----------------------------------------------------------------------
 

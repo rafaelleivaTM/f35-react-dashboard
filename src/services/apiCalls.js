@@ -13,7 +13,7 @@ import {
   miraSummaryStatsUpdated,
   robotsErrorInfoUpdated,
   zincSummaryStatsUpdated,
-} from '../redux/todayStatsSlide';
+} from '../redux/todayStatsSlice';
 import apiService from './apiService';
 import { getDateFormatted } from '../utils/formatTime';
 import { ROBOTS } from '../utils/constants';

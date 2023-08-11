@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useState } from "react";
 // @mui
-import { styled } from '@mui/material/styles';
-import { Input, Slide, Button, IconButton, InputAdornment, ClickAwayListener } from '@mui/material';
+import { styled } from "@mui/material/styles";
+import { Button, ClickAwayListener, IconButton, Input, InputAdornment, Slide } from "@mui/material";
 // utils
-import { bgBlur } from '../../../utils/cssStyles';
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { bgBlur } from "../../../utils/cssStyles";
 // component
-import Iconify from '../../../components/iconify';
+import Iconify from "../../../components/iconify";
+import { searchOrdersUpdated } from "../../../redux/searchOrdersSlice";
+import { parseSearchInput } from "../../../utils/functionsUtils";
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +37,10 @@ const StyledSearchbar = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function Searchbar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   const handleOpen = () => {
     setOpen(!open);
@@ -41,6 +48,18 @@ export default function Searchbar() {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const searchAction = () => {
+    if (inputValue) {
+      const orders = parseSearchInput(inputValue);
+      dispatch(searchOrdersUpdated(orders));
+      setInputValue('');
+      navigate('/dashboard/orders');
+    } else {
+      dispatch(searchOrdersUpdated([]));
+      setOpen(false);
+    }
   };
 
   return (
@@ -65,8 +84,10 @@ export default function Searchbar() {
                 </InputAdornment>
               }
               sx={{ mr: 1, fontWeight: 'fontWeightBold' }}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
-            <Button variant="contained" onClick={handleClose}>
+            <Button variant="contained" onClick={searchAction}>
               Search
             </Button>
           </StyledSearchbar>
