@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   Card,
   Container,
+  IconButton,
   MenuItem,
   Paper,
   Popover,
@@ -18,12 +19,15 @@ import {
   TableRow,
   Typography
 } from "@mui/material"; // components
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Label from "../components/label";
 import Iconify from "../components/iconify";
 import Scrollbar from "../components/scrollbar"; // sections
 import { UserListHead, UserListToolbar } from "../sections/@dashboard/user"; // mock
 import USERLIST from "../_mock/user";
 import apiService from "../services/apiService";
+import { listOrdersUpdated, searchOrdersFilterUpdated } from "../redux/searchOrdersSlice";
 
 // ----------------------------------------------------------------------
 
@@ -68,6 +72,11 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function OrdersPage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const listedOrders = useSelector((state) => state.searchOrders.list);
+
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -83,6 +92,8 @@ export default function OrdersPage() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [orderList, setOrderList] = useState([]);
+
+  const [loading, setLoading] = useState(false);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -128,13 +139,32 @@ export default function OrdersPage() {
 
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
+    filter.paginator.rowsPerPage = parseInt(event.target.value, 10);
+    dispatch(searchOrdersFilterUpdated);
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
   const handleFilterByName = (searchOrders, filter) => {
     setPage(0);
+    setLoading(true);
+    if (searchOrders.length > 0) {
+      dispatch(
+        searchOrdersFilterUpdated({
+          ...filter,
+          paginator: { ...filter.paginator, rowsPerPage: searchOrders.length },
+        })
+      );
+    } else {
+      dispatch(
+        searchOrdersFilterUpdated({
+          ...filter,
+          paginator: { ...filter.paginator, rowsPerPage: 10 },
+        })
+      );
+    }
     apiService.searchOrdersInF35(searchOrders, filter).then((response) => {
       console.log('searchOrdersInF35', response);
+      setLoading(false);
       const orderList = response.data.map((order) => {
         return {
           id: order.id,
@@ -145,7 +175,7 @@ export default function OrdersPage() {
           createdAt: order.created_at,
         };
       });
-      setOrderList(orderList);
+      dispatch(listOrdersUpdated(orderList));
     });
   };
 
@@ -154,6 +184,10 @@ export default function OrdersPage() {
   const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
+
+  const handleIconClick = (orderId) => {
+    navigate(`/dashboard/order-details/${orderId}`);
+  };
 
   return (
     <>
@@ -172,7 +206,12 @@ export default function OrdersPage() {
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+            loading={loading}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -181,13 +220,13 @@ export default function OrdersPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={orderList.length}
+                  rowCount={listedOrders.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {orderList.map((row) => {
+                  {listedOrders.map((row) => {
                     const { id, orderId, so, warehouseId, purchaseStatus, createdAt } = row;
                     const selectedUser = selected.indexOf(id) !== -1;
 
@@ -218,10 +257,15 @@ export default function OrdersPage() {
                           </Label>
                         </TableCell>
 
+                        {/* <TableCell align="right"> */}
+                        {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}> */}
+                        {/*  <Iconify icon={'eva:more-vertical-fill'} /> */}
+                        {/* </IconButton> */}
+                        {/* </TableCell> */}
                         <TableCell align="right">
-                          {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}> */}
-                          {/*  <Iconify icon={'eva:more-vertical-fill'} /> */}
-                          {/* </IconButton> */}
+                          <IconButton size="large" color="inherit" onClick={() => handleIconClick(orderId)}>
+                            <Iconify icon={'mdi:eye'} />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     );
@@ -261,13 +305,18 @@ export default function OrdersPage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[10, 50, 100]}
             component="div"
-            count={USERLIST.length}
-            rowsPerPage={rowsPerPage}
+            count={orderList.length}
+            rowsPerPage={filter?.paginator?.rowsPerPage || 10}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              '& .MuiTablePagination-displayedRows': {
+                display: 'none',
+              },
+            }}
           />
         </Card>
       </Container>

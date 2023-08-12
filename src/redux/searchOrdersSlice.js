@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  orders: [],
+  searched: [],
+  list: [],
   filter: {
     minDate: '',
     maxDate: '',
@@ -19,14 +20,17 @@ const searchedOrdersSlice = createSlice({
   initialState,
   reducers: {
     searchOrdersUpdated(state, action) {
-      state.orders = action.payload;
+      state.searched = action.payload;
     },
     searchOrdersFilterUpdated(state, action) {
       state.filter = action.payload;
     },
+    listOrdersUpdated(state, action) {
+      state.list = action.payload;
+    },
   },
 });
 
-export const { searchOrdersUpdated, searchOrdersFilterUpdated } = searchedOrdersSlice.actions;
+export const { searchOrdersUpdated, searchOrdersFilterUpdated, listOrdersUpdated } = searchedOrdersSlice.actions;
 
 export default searchedOrdersSlice.reducer;

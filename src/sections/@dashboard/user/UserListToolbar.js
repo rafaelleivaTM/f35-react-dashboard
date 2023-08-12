@@ -1,7 +1,16 @@
 import PropTypes from "prop-types";
 // @mui
 import { alpha, styled } from "@mui/material/styles";
-import { IconButton, InputAdornment, OutlinedInput, Toolbar, Tooltip, Typography } from "@mui/material";
+import {
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+  Stack,
+  Toolbar,
+  Tooltip,
+  Typography
+} from "@mui/material";
 // component
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +27,9 @@ const StyledRoot = styled(Toolbar)(({ theme }) => ({
   padding: theme.spacing(0, 1, 0, 3),
 }));
 
-const StyledSearch = styled(OutlinedInput)(({ theme, hasValue }) => ({
+const StyledSearch = styled(OutlinedInput, {
+  shouldForwardProp: (prop) => prop !== 'hasValue',
+})(({ theme, hasValue }) => ({
   width: hasValue ? '100%' : 240,
   marginRight: theme.spacing(3),
   transition: theme.transitions.create(['box-shadow', 'width'], {
@@ -39,20 +50,27 @@ const StyledSearch = styled(OutlinedInput)(({ theme, hasValue }) => ({
 
 UserListToolbar.propTypes = {
   numSelected: PropTypes.number,
-  filterName: PropTypes.string,
+  loading: PropTypes.bool,
   onFilterName: PropTypes.func,
 };
 
-export default function UserListToolbar({ numSelected, filterName, onFilterName }) {
+export default function UserListToolbar({ numSelected, loading, onFilterName }) {
   const inputRef = useRef();
   const dispatch = useDispatch();
 
-  const searchOrders = useSelector((state) => state.searchOrders.orders);
+  const searchOrders = useSelector((state) => state.searchOrders.searched);
   const filter = useSelector((state) => state.searchOrders.filter);
+  const listedOrders = useSelector((state) => state.searchOrders.list);
 
   useEffect(() => {
+    if (searchOrders.length === 0 && listedOrders.length > 0) return;
+    const isSearchOrdersInListedOrders = searchOrders.every((searchOrder) =>
+      listedOrders.some((listedOrder) => listedOrder.orderId === searchOrder)
+    );
+    if (isSearchOrdersInListedOrders) return;
     onFilterName(searchOrders, filter);
   }, [searchOrders]);
+
   const onChangeInputSearchValue = (event) => {
     if (event.target.value === '') {
       dispatch(searchOrdersUpdated([]));
@@ -100,11 +118,14 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <Iconify icon="ic:round-filter-list" />
-          </IconButton>
-        </Tooltip>
+        <Stack direction={'row'} spacing={2} alignSelf={'center'}>
+          {loading ? <CircularProgress size={30} /> : <></>}
+          <Tooltip title="Filter list">
+            <IconButton>
+              <Iconify icon="ic:round-filter-list" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       )}
     </StyledRoot>
   );
