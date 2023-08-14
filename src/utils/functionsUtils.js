@@ -1,3 +1,1 @@
-export const parseSearchInput = (input) => {
-  return input.replace(/['"\n]/g, '').split(/[\s,]+/);
-};
+export const parseSearchInput = (input) => input.replace(/['"\n]/g, '').split(/[\s,]+/);

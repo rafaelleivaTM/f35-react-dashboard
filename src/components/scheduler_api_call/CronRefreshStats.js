@@ -5,14 +5,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Iconify from '../iconify';
 import { getScheduleCronInterval } from '../../utils/constants';
 import { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus } from '../../redux/appConfigSlice';
+import { getDateFormatted } from '../../utils/formatTime';
 import {
-  fetchDOOrdersStats,
-  fetchEbayOrdersStats,
-  fetchF35GeneralSummaryToday,
-  fetchMiraOrdersStats,
-  fetchRobotsErrorInfo,
-  fetchZincOrdersStats,
-} from '../../services/apiCalls';
+  useGetF35GeneralSummaryQuery,
+  useGetSummaryEfficiencyByRobotQuery,
+  useRobotsErrorInfoQuery,
+} from '../../redux/api/apiSlice';
 
 const CronRefreshStats = () => {
   const theme = useTheme();
@@ -22,6 +20,14 @@ const CronRefreshStats = () => {
   const isCronActive = useSelector((state) => state.appConfig.cronRefreshStatsStatus);
 
   const [isSchedulerTimeInputValid, setIsSchedulerTimeInputValid] = useState(true);
+
+  const date = getDateFormatted();
+  const { refetch: refetchF35GeneralSummary } = useGetF35GeneralSummaryQuery(date);
+  const { refetch: refetchDoSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'DO' });
+  const { refetch: refetchZincSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Zinc' });
+  const { refetch: refetchEbaySummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Ebay' });
+  const { refetch: refetchMiraSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Mira' });
+  const { refetch: refetchRobotsErrorInfo } = useRobotsErrorInfoQuery(undefined);
 
   useEffect(() => {
     let intervalId;
@@ -33,19 +39,29 @@ const CronRefreshStats = () => {
         intervalId = setInterval(() => {
           console.log(`Update stats running every ${schedulerTimeValue}. Executed now! ${new Date()}`);
 
-          fetchF35GeneralSummaryToday(dispatch).then();
-          fetchRobotsErrorInfo(dispatch).then();
-          fetchDOOrdersStats(dispatch).then();
-          fetchZincOrdersStats(dispatch).then();
-          fetchEbayOrdersStats(dispatch).then();
-          fetchMiraOrdersStats(dispatch).then();
+          refetchF35GeneralSummary();
+          refetchDoSummaryStats();
+          refetchZincSummaryStats();
+          refetchEbaySummaryStats();
+          refetchMiraSummaryStats();
+          refetchRobotsErrorInfo();
         }, interval);
       }
 
       return () => clearInterval(intervalId);
     }
     return () => {};
-  }, [isCronActive, schedulerTimeValue, dispatch]);
+  }, [
+    isCronActive,
+    schedulerTimeValue,
+    dispatch,
+    refetchF35GeneralSummary,
+    refetchDoSummaryStats,
+    refetchZincSummaryStats,
+    refetchEbaySummaryStats,
+    refetchMiraSummaryStats,
+    refetchRobotsErrorInfo,
+  ]);
 
   const getScheduleInputValue = (event) => {
     if (!event.target.value) return;

@@ -3,7 +3,8 @@ import ReactApexChart from "react-apexcharts";
 // @mui
 import { styled, useTheme } from "@mui/material/styles";
 // utils
-import { Box, Card, CardActions, CardContent, CardHeader, Skeleton } from "@mui/material";
+import { Box, Card, CardActions, CardContent, CardHeader, CircularProgress, Skeleton } from "@mui/material";
+import { useEffect, useRef } from "react";
 import { fNumber } from "../../../utils/formatNumber";
 // components
 import { useChart } from "../../../components/chart";
@@ -38,6 +39,7 @@ DonutChartPanel.propTypes = {
   chartColors: PropTypes.arrayOf(PropTypes.string),
   chartData: PropTypes.array,
   loading: PropTypes.bool,
+  silenceLoading: PropTypes.bool,
   effectiveness: PropTypes.number,
 };
 
@@ -49,9 +51,11 @@ export default function DonutChartPanel({
   chartColors,
   chartData,
   loading,
+  silenceLoading,
   ...other
 }) {
   const theme = useTheme();
+  const chartRef = useRef(null);
 
   const chartLabels = chartData.map((i) => i.label);
 
@@ -73,29 +77,40 @@ export default function DonutChartPanel({
         },
       },
     },
-    plotOptions: {
-      pie: {
-        donut: {
-          labels: {
-            show: true,
-            total: {
-              show: true,
-              showAlways: true,
-              fontSize: '22px',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              fontWeight: 600,
-              color: '#09495d',
-              formatter: () => total.toLocaleString(),
+  });
+
+  useEffect(() => {
+    if (chartRef.current) {
+      chartRef.current.chart.updateOptions({
+        plotOptions: {
+          pie: {
+            donut: {
+              labels: {
+                show: true,
+                total: {
+                  show: true,
+                  showAlways: true,
+                  fontSize: '22px',
+                  fontFamily: 'Helvetica, Arial, sans-serif',
+                  fontWeight: 600,
+                  color: '#09495d',
+                  formatter: () => total.toLocaleString(),
+                },
+              },
             },
           },
         },
-      },
-    },
-  });
+      });
+    }
+  }, [total]);
 
   return (
     <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
+      <CardHeader
+        title={title}
+        subheader={subheader}
+        action={silenceLoading ? <CircularProgress size={30} /> : <></>}
+      />
       {loading ? (
         <Box display={'flex'} justifyContent={'center'} sx={{ p: 3 }}>
           <Skeleton variant="rounded" width={CHART_HEIGHT} height={CHART_HEIGHT + 30} />
@@ -104,7 +119,14 @@ export default function DonutChartPanel({
         <>
           <CardContent sx={{ px: 1, pt: 1, pb: 0 }}>
             <StyledChartWrapper dir="ltr">
-              <ReactApexChart title={total} type="donut" series={chartSeries} options={chartOptions} height={280} />
+              <ReactApexChart
+                title={total}
+                ref={chartRef}
+                type="donut"
+                series={chartSeries}
+                options={chartOptions}
+                height={280}
+              />
             </StyledChartWrapper>
           </CardContent>
           <CardActions sx={{ width: '100%', px: 3 }}>

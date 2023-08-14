@@ -3,7 +3,7 @@ import ReactApexChart from "react-apexcharts";
 // @mui
 import { styled, useTheme } from "@mui/material/styles";
 // utils
-import { Box, Card, CardActions, CardContent, CardHeader, Skeleton } from "@mui/material";
+import { Box, Card, CardActions, CardContent, CardHeader, CircularProgress, Skeleton } from "@mui/material";
 import { fNumber } from "../../../utils/formatNumber";
 // components
 import { useChart } from "../../../components/chart";
@@ -39,6 +39,7 @@ PieChartRobotStat.propTypes = {
   total: PropTypes.number,
   effectiveness: PropTypes.number,
   loading: PropTypes.bool,
+  silenceLoading: PropTypes.bool,
 };
 
 export default function PieChartRobotStat({
@@ -49,6 +50,7 @@ export default function PieChartRobotStat({
   total,
   effectiveness,
   loading,
+  silenceLoading,
   ...other
 }) {
   const theme = useTheme();
@@ -79,7 +81,11 @@ export default function PieChartRobotStat({
 
   return (
     <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
+      <CardHeader
+        title={title}
+        subheader={subheader}
+        action={silenceLoading ? <CircularProgress size={30} /> : <></>}
+      />
       {loading ? (
         <Box display={'flex'} justifyContent={'center'} sx={{ p: 3 }}>
           <Skeleton variant="rounded" width={CHART_HEIGHT} height={CHART_HEIGHT + 30} />

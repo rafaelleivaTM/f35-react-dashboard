@@ -67,9 +67,9 @@ export default function UserListToolbar({ numSelected, loading, onFilterName }) 
     const isSearchOrdersInListedOrders = searchOrders.every((searchOrder) =>
       listedOrders.some((listedOrder) => listedOrder.orderId === searchOrder)
     );
-    if (isSearchOrdersInListedOrders) return;
+    if (isSearchOrdersInListedOrders && listedOrders.length > 0 && searchOrders.length > 0) return;
     onFilterName(searchOrders, filter);
-  }, [searchOrders]);
+  }, [searchOrders, listedOrders, filter, onFilterName]);
 
   const onChangeInputSearchValue = (event) => {
     if (event.target.value === '') {

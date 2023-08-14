@@ -18,7 +18,12 @@ import apiService from "../services/apiService";
 import { STATUS_COLORS } from "../utils/constants";
 import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
 import { addNotification } from "../redux/notificationsSlice";
-import { fetchF35ChartsDataForToday } from "../services/apiCalls";
+import {
+  useGetF35GeneralSummaryQuery,
+  useGetSummaryEfficiencyByRobotQuery,
+  useRobotsErrorInfoQuery
+} from "../redux/api/apiSlice";
+import { getDateFormatted } from "../utils/formatTime";
 
 // ----------------------------------------------------------------------
 
@@ -32,23 +37,43 @@ export default function DashboardAppPage() {
   const [summaryEfficiencyByRange, setSummaryEfficiencyByRange] = useState({});
   const [loadingSummaryEfficiencyByRange, setLoadingSummaryEfficiencyByRange] = useState(false);
 
-  const f35SummaryStats = useSelector((state) => state.todayStats.f35SummaryStats);
-  const loadingF35SummaryStats = useSelector((state) => state.todayStats.loadingF35SummaryStats);
+  const date = getDateFormatted();
+  const {
+    data: f35SummaryStats,
+    isLoading: loadingF35SummaryStats,
+    isFetching: fetchingF35SummaryStats,
+  } = useGetF35GeneralSummaryQuery(date);
 
-  const robotsErrorInfo = useSelector((state) => state.todayStats.robotsErrorInfo);
-  const loadingRobotsErrors = useSelector((state) => state.todayStats.loadingRobotsErrors);
+  const {
+    data: doSummaryStats,
+    isLoading: loadingDoSummaryStats,
+    isFetching: fetchingDoSummaryStats,
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'DO' });
+  if (doSummaryStats) console.log(`Response of doSummaryStats`, doSummaryStats);
 
-  const doSummaryStats = useSelector((state) => state.todayStats.doSummaryStats);
-  const loadingDoSummaryStats = useSelector((state) => state.todayStats.loadingDoSummaryStats);
+  const {
+    data: zincSummaryStats,
+    isLoading: loadingZincSummaryStats,
+    isFetching: fetchingZincSummaryStats,
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Zinc' });
+  if (zincSummaryStats) console.log(`Response of zincSummaryStats`, zincSummaryStats);
 
-  const zincSummaryStats = useSelector((state) => state.todayStats.zincSummaryStats);
-  const loadingZincSummaryStats = useSelector((state) => state.todayStats.loadingZincSummaryStats);
+  const {
+    data: ebaySummaryStats,
+    isLoading: loadingEbaySummaryStats,
+    isFetching: fetchingEbaySummaryStats,
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Ebay' });
+  if (ebaySummaryStats) console.log(`Response of ebaySummaryStats`, ebaySummaryStats);
 
-  const ebaySummaryStats = useSelector((state) => state.todayStats.ebaySummaryStats);
-  const loadingEbaySummaryStats = useSelector((state) => state.todayStats.loadingEbaySummaryStats);
+  const {
+    data: miraSummaryStats,
+    isLoading: loadingMiraSummaryStats,
+    isFetching: fetchingMiraSummaryStats,
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Mira' });
+  if (miraSummaryStats) console.log(`Response of miraSummaryStats`, miraSummaryStats);
 
-  const miraSummaryStats = useSelector((state) => state.todayStats.miraSummaryStats);
-  const loadingMiraSummaryStats = useSelector((state) => state.todayStats.loadingMiraSummaryStats);
+  const { data: robotsErrorInfo, isLoading: loadingRobotsErrors } = useRobotsErrorInfoQuery();
+  if (robotsErrorInfo) console.log(`Response of robotsErrorInfo`, robotsErrorInfo);
 
   const [summaryEfficiencyCriteriaChartValue, setSummaryEfficiencyCriteriaChartValue] = useState('Effectiveness');
 
@@ -95,12 +120,6 @@ export default function DashboardAppPage() {
 
     fetchMissingOrdersBetweenBPAndF35().then();
   }, [dispatch]);
-
-  useEffect(() => {
-    if (!f35SummaryStats || Object.keys(f35SummaryStats).length === 0) {
-      fetchF35ChartsDataForToday(dispatch).then();
-    }
-  }, [dispatch, f35SummaryStats]);
 
   return (
     <>
@@ -171,7 +190,7 @@ export default function DashboardAppPage() {
                 ]}
               />
 
-              <AppErrorList title="Errores" list={robotsErrorInfo} loading={loadingRobotsErrors} />
+              <AppErrorList title="Errores" list={robotsErrorInfo || []} loading={loadingRobotsErrors} />
 
               <AppTasks
                 title="Tasks"
@@ -193,6 +212,7 @@ export default function DashboardAppPage() {
                 total={parseInt(f35SummaryStats?.total, 10) || 0}
                 effectiveness={parseInt(f35SummaryStats?.overall_effectiveness, 10) || 0}
                 loading={loadingF35SummaryStats}
+                silenceLoading={!loadingF35SummaryStats && fetchingF35SummaryStats}
                 chartData={[
                   { label: 'In Progress', value: parseInt(f35SummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(f35SummaryStats?.Pending, 10) || 0 },
@@ -217,13 +237,14 @@ export default function DashboardAppPage() {
                   { label: 'In Progress', value: parseInt(doSummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(doSummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(doSummaryStats?.Failed, 10) || 0 },
-                  { label: 'Cancelled', value: parseInt(doSummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(doSummaryStats?.Cancelled, 10) || 0 },
                   { label: 'Warning', value: parseInt(doSummaryStats?.Warning, 10) || 0 },
                   { label: 'Success', value: parseInt(doSummaryStats?.Success, 10) || 0 },
                   { label: 'DevBlocked', value: parseInt(doSummaryStats?.DevBlocked, 10) || 0 },
                 ]}
                 chartColors={STATUS_COLORS}
                 loading={loadingDoSummaryStats}
+                silenceLoading={!loadingDoSummaryStats && fetchingDoSummaryStats}
               />
 
               <PieChartRobotStat
@@ -234,13 +255,14 @@ export default function DashboardAppPage() {
                   { label: 'In Progress', value: parseInt(zincSummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(zincSummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(zincSummaryStats?.Failed, 10) || 0 },
-                  { label: 'Cancelled', value: parseInt(zincSummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(zincSummaryStats?.Cancelled, 10) || 0 },
                   { label: 'Warning', value: parseInt(zincSummaryStats?.Warning, 10) || 0 },
                   { label: 'Success', value: parseInt(zincSummaryStats?.Success, 10) || 0 },
                   { label: 'DevBlocked', value: parseInt(zincSummaryStats?.DevBlocked, 10) || 0 },
                 ]}
                 chartColors={STATUS_COLORS}
                 loading={loadingZincSummaryStats}
+                silenceLoading={!loadingZincSummaryStats && fetchingZincSummaryStats}
               />
 
               <PieChartRobotStat
@@ -251,13 +273,14 @@ export default function DashboardAppPage() {
                   { label: 'In Progress', value: parseInt(ebaySummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(ebaySummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(ebaySummaryStats?.Failed, 10) || 0 },
-                  { label: 'Cancelled', value: parseInt(ebaySummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(ebaySummaryStats?.Cancelled, 10) || 0 },
                   { label: 'Warning', value: parseInt(ebaySummaryStats?.Warning, 10) || 0 },
                   { label: 'Success', value: parseInt(ebaySummaryStats?.Success, 10) || 0 },
                   { label: 'DevBlocked', value: parseInt(ebaySummaryStats?.DevBlocked, 10) || 0 },
                 ]}
                 chartColors={STATUS_COLORS}
                 loading={loadingEbaySummaryStats}
+                silenceLoading={!loadingEbaySummaryStats && fetchingEbaySummaryStats}
               />
 
               <PieChartRobotStat
@@ -268,13 +291,14 @@ export default function DashboardAppPage() {
                   { label: 'In Progress', value: parseInt(miraSummaryStats?.InProgress, 10) || 0 },
                   { label: 'Pending', value: parseInt(miraSummaryStats?.Pending, 10) || 0 },
                   { label: 'Failed', value: parseInt(miraSummaryStats?.Failed, 10) || 0 },
-                  { label: 'Cancelled', value: parseInt(miraSummaryStats.Cancelled, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(miraSummaryStats?.Cancelled, 10) || 0 },
                   { label: 'Warning', value: parseInt(miraSummaryStats?.Warning, 10) || 0 },
                   { label: 'Success', value: parseInt(miraSummaryStats?.Success, 10) || 0 },
                   { label: 'DevBlocked', value: parseInt(miraSummaryStats?.DevBlocked, 10) || 0 },
                 ]}
                 chartColors={STATUS_COLORS}
                 loading={loadingMiraSummaryStats}
+                silenceLoading={!loadingMiraSummaryStats && fetchingMiraSummaryStats}
               />
 
               {/* <AppCurrentSubject */}

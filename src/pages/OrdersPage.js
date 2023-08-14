@@ -35,8 +35,11 @@ const TABLE_HEAD = [
   { id: 'orderId', label: 'Order Id', alignRight: false },
   { id: 'so', label: 'SO', alignRight: false },
   { id: 'warehouseId', label: 'Warehouse', alignRight: false },
+  { id: 'orderStatus', label: 'Status', alignRight: false },
+  // { id: 'customerEmail', label: 'Email', alignRight: false },
+  { id: 'schedules', label: 'Robots', alignRight: false },
+  { id: 'schedulesStatuses', label: 'Robots Status', alignRight: false },
   { id: 'createdAt', label: 'Created', alignRight: false },
-  { id: 'purchaseStatus', label: 'Status', alignRight: false },
   { id: '' },
 ];
 
@@ -171,7 +174,10 @@ export default function OrdersPage() {
           orderId: order.order_id,
           so: order.so,
           warehouseId: order.warehouseId,
-          purchaseStatus: order.purchase_status,
+          orderStatus: order.order_status,
+          customerEmail: order.customer_email,
+          schedules: order.schedules,
+          schedulesStatuses: order.statuses,
           createdAt: order.created_at,
         };
       });
@@ -227,7 +233,17 @@ export default function OrdersPage() {
                 />
                 <TableBody>
                   {listedOrders.map((row) => {
-                    const { id, orderId, so, warehouseId, purchaseStatus, createdAt } = row;
+                    const {
+                      id,
+                      orderId,
+                      so,
+                      warehouseId,
+                      orderStatus,
+                      customerEmail,
+                      schedules,
+                      schedulesStatuses,
+                      createdAt,
+                    } = row;
                     const selectedUser = selected.indexOf(id) !== -1;
 
                     return (
@@ -249,13 +265,19 @@ export default function OrdersPage() {
 
                         <TableCell align="left">{warehouseId}</TableCell>
 
-                        <TableCell align="left">{createdAt}</TableCell>
-
                         <TableCell align="left">
-                          <Label color={(purchaseStatus === 'banned' && 'error') || 'success'}>
-                            {sentenceCase(purchaseStatus)}
+                          <Label color={(orderStatus === 'banned' && 'error') || 'success'}>
+                            {sentenceCase(orderStatus)}
                           </Label>
                         </TableCell>
+
+                        {/* <TableCell align="left">{customerEmail}</TableCell> */}
+
+                        <TableCell align="left">{schedules}</TableCell>
+
+                        <TableCell align="left">{schedulesStatuses}</TableCell>
+
+                        <TableCell align="left">{createdAt}</TableCell>
 
                         {/* <TableCell align="right"> */}
                         {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}> */}

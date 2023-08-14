@@ -3,9 +3,8 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 // @mui
 import { alpha, styled } from "@mui/material/styles";
-import { Avatar, Box, Drawer, Link, Stack, Typography } from "@mui/material";
+import { Box, Drawer, Stack, Typography } from "@mui/material";
 // mock
-import account from "../../../_mock/account";
 // hooks
 import useResponsive from "../../../hooks/useResponsive";
 // components
@@ -17,7 +16,7 @@ import navConfig from "./config";
 
 // ----------------------------------------------------------------------
 
-const NAV_WIDTH = 265;
+const NAV_WIDTH = 200;
 
 const StyledAccount = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -57,23 +56,23 @@ export default function Nav({ openNav, onCloseNav }) {
         <Logo />
       </Box>
 
-      <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none">
-          <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
+      {/* <Box sx={{ mb: 5, mx: 2.5 }}> */}
+      {/*  <Link underline="none"> */}
+      {/*    <StyledAccount> */}
+      {/*      <Avatar src={account.photoURL} alt="photoURL" /> */}
 
-            <Box sx={{ ml: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
-              </Typography>
+      {/*      <Box sx={{ ml: 2 }}> */}
+      {/*        <Typography variant="subtitle2" sx={{ color: 'text.primary' }}> */}
+      {/*          {account.displayName} */}
+      {/*        </Typography> */}
 
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
-              </Typography>
-            </Box>
-          </StyledAccount>
-        </Link>
-      </Box>
+      {/*        <Typography variant="body2" sx={{ color: 'text.secondary' }}> */}
+      {/*          {account.role} */}
+      {/*        </Typography> */}
+      {/*      </Box> */}
+      {/*    </StyledAccount> */}
+      {/*  </Link> */}
+      {/* </Box> */}
 
       <NavSection data={navConfig} />
 

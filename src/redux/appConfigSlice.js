@@ -7,6 +7,7 @@ const appConfigStorage = localStorageService.getItem(appConfigStorageName) || {}
 const initialState = {
   cronRefreshStatsInterval: appConfigStorage.cronRefreshStatsInterval || '30m',
   cronRefreshStatsStatus: appConfigStorage.cronRefreshStatsStatus || false,
+  f35SchedulesMetadata: appConfigStorage.f35SchedulesMetadata || [],
 };
 
 const appConfigSlice = createSlice({
@@ -23,9 +24,15 @@ const appConfigSlice = createSlice({
       state.cronRefreshStatsStatus = cronRefreshStatsStatus;
       localStorage.setItem(appConfigStorageName, JSON.stringify(state));
     },
+    updateF35SchedulesMetadata(state, action) {
+      const { f35SchedulesMetadata } = action.payload;
+      state.f35SchedulesMetadata = f35SchedulesMetadata;
+      localStorage.setItem(appConfigStorageName, JSON.stringify(state));
+    },
   },
 });
 
-export const { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus } = appConfigSlice.actions;
+export const { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus, updateF35SchedulesMetadata } =
+  appConfigSlice.actions;
 
 export default appConfigSlice.reducer;
