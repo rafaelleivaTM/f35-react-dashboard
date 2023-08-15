@@ -4,6 +4,7 @@ import { sentenceCase } from "change-case";
 import { useState } from "react";
 // @mui
 import {
+  Box,
   Card,
   Container,
   IconButton,
@@ -17,6 +18,7 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
+  Tooltip,
   Typography
 } from "@mui/material"; // components
 import { useDispatch, useSelector } from "react-redux";
@@ -26,21 +28,25 @@ import Iconify from "../components/iconify";
 import Scrollbar from "../components/scrollbar"; // sections
 import { UserListHead, UserListToolbar } from "../sections/@dashboard/user"; // mock
 import USERLIST from "../_mock/user";
-import apiService from "../services/apiService";
-import { listOrdersUpdated, searchOrdersFilterUpdated } from "../redux/searchOrdersSlice";
+import { searchOrdersFilterUpdated } from "../redux/searchOrdersSlice";
+import { BRAND_COLORS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_DATA } from "../utils/constants";
+import LetterAvatar from "../components/letter-avatar";
+import { getAbbreviation } from "../utils/functionsUtils";
+import { useSearchOrdersInF35Query } from "../redux/api/apiSlice";
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
+  { id: 'brands' },
   { id: 'orderId', label: 'Order Id', alignRight: false },
   { id: 'so', label: 'SO', alignRight: false },
   { id: 'warehouseId', label: 'Warehouse', alignRight: false },
   { id: 'orderStatus', label: 'Status', alignRight: false },
   // { id: 'customerEmail', label: 'Email', alignRight: false },
   { id: 'schedules', label: 'Robots', alignRight: false },
-  { id: 'schedulesStatuses', label: 'Robots Status', alignRight: false },
+  // { id: 'schedulesStatuses', label: 'Robots Status', alignRight: false },
   { id: 'createdAt', label: 'Created', alignRight: false },
-  { id: '' },
+  { id: 'action' },
 ];
 
 // ----------------------------------------------------------------------
@@ -78,7 +84,16 @@ export default function OrdersPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const listedOrders = useSelector((state) => state.searchOrders.list);
+  const f35SchedulesMetadata = useSelector((state) => state.appConfig.f35SchedulesMetadata);
+  const warehouseMetadata = useSelector((state) => state.appConfig.warehouseMetadata);
+  const searchOrders = useSelector((state) => state.searchOrders.searched);
+  const filter = useSelector((state) => state.searchOrders.filter);
+
+  let { data: listedOrders } = useSearchOrdersInF35Query({
+    orders: searchOrders,
+    filter,
+  });
+  listedOrders = listedOrders || [];
 
   const [open, setOpen] = useState(null);
 
@@ -92,11 +107,9 @@ export default function OrdersPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(filter.paginator.rowsPerPage || 50);
 
-  const [orderList, setOrderList] = useState([]);
-
-  const [loading, setLoading] = useState(false);
+  // const [orderList, setOrderList] = useState([]);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -142,47 +155,17 @@ export default function OrdersPage() {
 
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
-    filter.paginator.rowsPerPage = parseInt(event.target.value, 10);
-    dispatch(searchOrdersFilterUpdated);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    // filter.paginator.rowsPerPage = parseInt(event.target.value, 10);
+    dispatch(
+      searchOrdersFilterUpdated({
+        ...filter,
+        paginator: { ...filter.paginator, rowsPerPage: parseInt(event.target.value, 10) },
+      })
+    );
   };
 
   const handleFilterByName = (searchOrders, filter) => {
     setPage(0);
-    setLoading(true);
-    if (searchOrders.length > 0) {
-      dispatch(
-        searchOrdersFilterUpdated({
-          ...filter,
-          paginator: { ...filter.paginator, rowsPerPage: searchOrders.length },
-        })
-      );
-    } else {
-      dispatch(
-        searchOrdersFilterUpdated({
-          ...filter,
-          paginator: { ...filter.paginator, rowsPerPage: 10 },
-        })
-      );
-    }
-    apiService.searchOrdersInF35(searchOrders, filter).then((response) => {
-      console.log('searchOrdersInF35', response);
-      setLoading(false);
-      const orderList = response.data.map((order) => {
-        return {
-          id: order.id,
-          orderId: order.order_id,
-          so: order.so,
-          warehouseId: order.warehouseId,
-          orderStatus: order.order_status,
-          customerEmail: order.customer_email,
-          schedules: order.schedules,
-          schedulesStatuses: order.statuses,
-          createdAt: order.created_at,
-        };
-      });
-      dispatch(listOrdersUpdated(orderList));
-    });
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
@@ -195,13 +178,68 @@ export default function OrdersPage() {
     navigate(`/dashboard/order-details/${orderId}`);
   };
 
+  const getRobotInfo = (id) => {
+    const robotName = f35SchedulesMetadata.find((robot) => robot.id === id)?.method_code;
+    const robotData = ROBOTS_VISUAL_DATA.find((r) => r.name.toLowerCase() === robotName.toLowerCase());
+    return robotData ? { avatar: robotData.displayAvatarCode, color: robotData.color } : undefined;
+  };
+
+  const displayRobots = (schedules) => {
+    const robotsIds = schedules ? schedules.trim().split(',') : [];
+    return (
+      <Stack spacing={1} direction={'row'}>
+        {robotsIds.map((robotId, index) =>
+          getRobotInfo(robotId) ? (
+            <Box key={index}>
+              <LetterAvatar name={getRobotInfo(robotId)?.avatar} color={getRobotInfo(robotId)?.color} />
+            </Box>
+          ) : (
+            <></>
+          )
+        )}
+      </Stack>
+    );
+  };
+
+  const getLabelData = (brand) => {
+    const registerBrand = BRAND_COLORS.find((b) => b.code === brand);
+    const customColor = registerBrand ? registerBrand.color : ROBOTS_VISUAL_DATA.find((r) => r.name === 'MIRA')?.color;
+    const label = registerBrand ? brand : getAbbreviation(brand);
+    return { customColor, label };
+  };
+
+  const getBrandTooltip = (schedules) => {
+    const robotsIds = schedules ? schedules.trim().split(',') : [];
+    const brands = robotsIds.map((robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_name);
+    const uniqueBrands = [...new Set(brands)];
+    return uniqueBrands.join(', ');
+  };
+
+  const displayBrands = (schedules) => {
+    const robotsIds = schedules ? schedules.trim().split(',') : [];
+    const brands = robotsIds.map((robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_code);
+    const uniqueBrands = [...new Set(brands)];
+    const tooltipText = getBrandTooltip(schedules);
+    return (
+      <Stack>
+        {uniqueBrands.map((brand, index) => (
+          <Tooltip key={index} title={tooltipText}>
+            <Label customColor={getLabelData(brand).customColor}>{sentenceCase(getLabelData(brand).label)}</Label>
+          </Tooltip>
+        ))}
+      </Stack>
+    );
+  };
+
+  const getWareHouseName = (id) => warehouseMetadata.find((w) => w.id === id)?.name;
+
   return (
     <>
       <Helmet>
         <title> Orders </title>
       </Helmet>
 
-      <Container>
+      <Container maxWidth={'xl'}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             Orders
@@ -212,12 +250,7 @@ export default function OrdersPage() {
         </Stack>
 
         <Card>
-          <UserListToolbar
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
-            loading={loading}
-          />
+          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -226,7 +259,7 @@ export default function OrdersPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={listedOrders.length}
+                  rowCount={listedOrders?.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -251,6 +284,7 @@ export default function OrdersPage() {
                         {/* <TableCell padding="checkbox"> */}
                         {/*  <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} /> */}
                         {/* </TableCell> */}
+                        <TableCell padding="checkbox">{displayBrands(schedules)}</TableCell>
 
                         <TableCell component="th" scope="row">
                           <Stack direction="row" alignItems="center" spacing={2}>
@@ -263,19 +297,19 @@ export default function OrdersPage() {
 
                         <TableCell align="left">{so}</TableCell>
 
-                        <TableCell align="left">{warehouseId}</TableCell>
+                        <TableCell align="left">{getWareHouseName(warehouseId)}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(orderStatus === 'banned' && 'error') || 'success'}>
-                            {sentenceCase(orderStatus)}
+                          <Label customColor={F35_STATUS_COLORS[orderStatus]}>
+                            {sentenceCase(F35_STATUS[orderStatus])}
                           </Label>
                         </TableCell>
 
                         {/* <TableCell align="left">{customerEmail}</TableCell> */}
 
-                        <TableCell align="left">{schedules}</TableCell>
+                        <TableCell align="center">{displayRobots(schedules)}</TableCell>
 
-                        <TableCell align="left">{schedulesStatuses}</TableCell>
+                        {/* <TableCell align="left">{schedulesStatuses}</TableCell> */}
 
                         <TableCell align="left">{createdAt}</TableCell>
 
@@ -327,10 +361,10 @@ export default function OrdersPage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[10, 50, 100]}
+            rowsPerPageOptions={[50, 100, 150]}
             component="div"
-            count={orderList.length}
-            rowsPerPage={filter?.paginator?.rowsPerPage || 10}
+            count={listedOrders?.length}
+            rowsPerPage={filter?.paginator?.rowsPerPage || 50}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}

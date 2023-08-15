@@ -111,6 +111,7 @@ export default function DashboardAppPage() {
             type: 'order_critical',
             createdAt: new Date().toISOString(),
             isUnRead: true,
+            isCritical: true,
           };
           dispatch(addNotification(criticalNotification));
         });

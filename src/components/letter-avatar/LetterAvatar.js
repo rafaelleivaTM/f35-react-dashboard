@@ -1,18 +1,14 @@
 import React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Stack from '@mui/material/Stack';
 import PropTypes from 'prop-types';
 
 LetterAvatar.propTypes = {
   name: PropTypes.string,
   color: PropTypes.string,
 };
+
 function LetterAvatar({ name, color }) {
-  return (
-    <Stack direction="row" spacing={2}>
-      <Avatar sx={{ p: 4, bgcolor: color, fontSize: '100%' }}>{name}</Avatar>
-    </Stack>
-  );
+  return <Avatar sx={{ p: 1, bgcolor: color, fontSize: '60%', fontWeight: 'bold' }}>{name}</Avatar>;
 }
 
 export default LetterAvatar;

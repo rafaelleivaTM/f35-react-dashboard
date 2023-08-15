@@ -8,6 +8,7 @@ const initialState = {
   cronRefreshStatsInterval: appConfigStorage.cronRefreshStatsInterval || '30m',
   cronRefreshStatsStatus: appConfigStorage.cronRefreshStatsStatus || false,
   f35SchedulesMetadata: appConfigStorage.f35SchedulesMetadata || [],
+  warehouseMetadata: appConfigStorage.warehouseMetadata || [],
 };
 
 const appConfigSlice = createSlice({
@@ -29,10 +30,19 @@ const appConfigSlice = createSlice({
       state.f35SchedulesMetadata = f35SchedulesMetadata;
       localStorage.setItem(appConfigStorageName, JSON.stringify(state));
     },
+    updateWarehouseMetadata(state, action) {
+      const { warehouseMetadata } = action.payload;
+      state.warehouseMetadata = warehouseMetadata;
+      localStorage.setItem(appConfigStorageName, JSON.stringify(state));
+    },
   },
 });
 
-export const { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus, updateF35SchedulesMetadata } =
-  appConfigSlice.actions;
+export const {
+  updateCronRefreshStatsInterval,
+  updateCronRefreshStatsStatus,
+  updateF35SchedulesMetadata,
+  updateWarehouseMetadata,
+} = appConfigSlice.actions;
 
 export default appConfigSlice.reducer;

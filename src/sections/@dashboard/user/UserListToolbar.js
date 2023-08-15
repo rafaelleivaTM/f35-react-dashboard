@@ -12,11 +12,12 @@ import {
   Typography
 } from "@mui/material";
 // component
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Iconify from "../../../components/iconify";
 import { parseSearchInput } from "../../../utils/functionsUtils";
 import { searchOrdersUpdated } from "../../../redux/searchOrdersSlice";
+import { useSearchOrdersInF35Query } from "../../../redux/api/apiSlice";
 
 // ----------------------------------------------------------------------
 
@@ -50,26 +51,16 @@ const StyledSearch = styled(OutlinedInput, {
 
 UserListToolbar.propTypes = {
   numSelected: PropTypes.number,
-  loading: PropTypes.bool,
   onFilterName: PropTypes.func,
 };
 
-export default function UserListToolbar({ numSelected, loading, onFilterName }) {
+export default function UserListToolbar({ numSelected, onFilterName }) {
   const inputRef = useRef();
   const dispatch = useDispatch();
 
   const searchOrders = useSelector((state) => state.searchOrders.searched);
   const filter = useSelector((state) => state.searchOrders.filter);
-  const listedOrders = useSelector((state) => state.searchOrders.list);
-
-  useEffect(() => {
-    if (searchOrders.length === 0 && listedOrders.length > 0) return;
-    const isSearchOrdersInListedOrders = searchOrders.every((searchOrder) =>
-      listedOrders.some((listedOrder) => listedOrder.orderId === searchOrder)
-    );
-    if (isSearchOrdersInListedOrders && listedOrders.length > 0 && searchOrders.length > 0) return;
-    onFilterName(searchOrders, filter);
-  }, [searchOrders, listedOrders, filter, onFilterName]);
+  const { isFetching: loading } = useSearchOrdersInF35Query({ orders: searchOrders, filter });
 
   const onChangeInputSearchValue = (event) => {
     if (event.target.value === '') {

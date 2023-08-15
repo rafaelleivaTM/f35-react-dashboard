@@ -1,45 +1,33 @@
-export const ROBOTS = [
+export const ROBOTS_VISUAL_DATA = [
   {
     id: 1,
     displayAvatarCode: 'DO',
-    name: 'do',
+    name: 'DO',
     color: '#2735ef',
-    active: true,
   },
   {
     id: 2,
     displayAvatarCode: 'ZINC',
-    name: 'zincAMZ',
+    name: 'ZINC',
     color: '#8bc3ea',
-    active: true,
   },
   {
     id: 3,
     displayAvatarCode: 'EBAY',
-    name: 'ebay',
+    name: 'EBAY',
     color: '#ed52d9',
-    active: true,
   },
   {
     id: 4,
-    displayAvatarCode: 'ZWRT',
-    name: 'zincWRT',
-    color: '#70ab32',
-    active: false,
-  },
-  {
-    id: 5,
-    displayAvatarCode: 'ZWRT',
-    name: 'zincWRTSA',
-    color: '#F2EA98FF',
-    active: false,
-  },
-  {
-    id: 5,
     displayAvatarCode: 'MIRA',
     name: 'MIRA',
-    color: '#ea072f',
-    active: false,
+    color: '#a04406',
+  },
+  {
+    id: 5,
+    displayAvatarCode: 'STOCK',
+    name: 'STOCK',
+    color: '#907f3b',
   },
 ];
 
@@ -64,6 +52,29 @@ export const F35_STATUS = {
   107: 'CANCELLED_CLIENT',
   108: 'CANCELLED_PAYMENT',
   110: 'SKIPPED',
+};
+
+export const F35_STATUS_COLORS = {
+  1: 'rgb(236,158,214)',
+  2: 'rgb(236,158,214)',
+  20: 'rgb(34,120,206)',
+  21: 'rgb(34,120,206)',
+  26: 'rgb(34,120,206)',
+  22: 'rgb(34,120,206)',
+  23: 'rgb(34,120,206)',
+  24: 'rgb(64,157,95)',
+  25: 'rgb(34,120,206)',
+  27: 'rgb(247,10,10)',
+  101: 'rgb(247,10,10)',
+  102: 'rgb(176,146,35)',
+  103: 'rgb(64,157,95)',
+  104: 'rgb(247,10,10)',
+  109: 'rgb(247,10,10)',
+  105: 'rgb(230,114,93)',
+  106: 'rgb(230,114,93)',
+  107: 'rgb(230,114,93)',
+  108: 'rgb(230,114,93)',
+  110: 'rgb(149,149,153)',
 };
 
 export const STATUS_COLORS = [
@@ -101,3 +112,31 @@ export const getScheduleCronInterval = (value) => {
     return null;
   }
 };
+
+export const BRAND_COLORS = [
+  {
+    brand: 'Amazon',
+    code: 'AMZ',
+    color: '#FF9900',
+  },
+  {
+    brand: 'eBay',
+    code: 'EBAY',
+    color: '#86B817',
+  },
+  {
+    brand: 'Macys',
+    code: 'MCY',
+    color: '#E11A2B',
+  },
+  {
+    brand: 'Walmart',
+    code: 'WRT',
+    color: '#0071CE',
+  },
+  {
+    brand: 'Mira',
+    code: 'MIRA',
+    color: '#fe6766',
+  },
+];

@@ -5,7 +5,7 @@ import { Box, Card, CardHeader, CircularProgress, FormControl, MenuItem, Select,
 // components
 import { useRef } from "react";
 import { useChart } from "../../../components/chart";
-import { ROBOTS } from "../../../utils/constants";
+import { ROBOTS_VISUAL_DATA } from "../../../utils/constants";
 
 // ----------------------------------------------------------------------
 
@@ -33,10 +33,10 @@ export default function LineChartsRobotsSummary({
 
   const chartOptions = useChart({
     colors: [
-      ROBOTS.find((r) => r.displayAvatarCode === 'DO').color,
-      ROBOTS.find((r) => r.displayAvatarCode === 'ZINC').color,
-      ROBOTS.find((r) => r.displayAvatarCode === 'EBAY').color,
-      ROBOTS.find((r) => r.displayAvatarCode === 'MIRA').color,
+      ROBOTS_VISUAL_DATA.find((r) => r.displayAvatarCode === 'DO').color,
+      ROBOTS_VISUAL_DATA.find((r) => r.displayAvatarCode === 'ZINC').color,
+      ROBOTS_VISUAL_DATA.find((r) => r.displayAvatarCode === 'EBAY').color,
+      ROBOTS_VISUAL_DATA.find((r) => r.displayAvatarCode === 'MIRA').color,
     ],
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },

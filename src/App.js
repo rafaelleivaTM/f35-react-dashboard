@@ -9,15 +9,19 @@ import ThemeProvider from "./theme";
 // components
 import { StyledChart } from "./components/chart";
 import ScrollToTop from "./components/scroll-to-top";
-import { useGetSchedulesGroupsAndMethodsMapQuery } from "./redux/api/apiSlice";
-import { updateF35SchedulesMetadata } from "./redux/appConfigSlice";
+import { useGetSchedulesGroupsAndMethodsMapQuery, useGetWarehouseMetaDataQuery } from "./redux/api/apiSlice";
+import { updateF35SchedulesMetadata, updateWarehouseMetadata } from "./redux/appConfigSlice";
 
 // ----------------------------------------------------------------------
 
 export default function App() {
   const dispatch = useDispatch();
+  const warehouseMetadata = useSelector((state) => state.appConfig.warehouseMetadata);
+  const { data: warehouseMetadataResponse } = useGetWarehouseMetaDataQuery(undefined, {
+    skip: warehouseMetadata.length > 0,
+  });
   const f35SchedulesMetadata = useSelector((state) => state.appConfig.f35SchedulesMetadata);
-  const { f35SchedulesMetadataResponse } = useGetSchedulesGroupsAndMethodsMapQuery(undefined, {
+  const { data: f35SchedulesMetadataResponse } = useGetSchedulesGroupsAndMethodsMapQuery(undefined, {
     skip: f35SchedulesMetadata.length > 0,
   });
 
@@ -26,6 +30,12 @@ export default function App() {
       dispatch(updateF35SchedulesMetadata({ f35SchedulesMetadata: f35SchedulesMetadataResponse?.data }));
     }
   }, [f35SchedulesMetadataResponse, dispatch]);
+
+  useEffect(() => {
+    if (warehouseMetadataResponse) {
+      dispatch(updateWarehouseMetadata({ warehouseMetadata: warehouseMetadataResponse?.data }));
+    }
+  }, [warehouseMetadataResponse, dispatch]);
 
   useEffect(() => {
     // Request permission to show notifications

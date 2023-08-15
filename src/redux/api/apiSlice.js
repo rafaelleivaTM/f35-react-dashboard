@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { faker } from '@faker-js/faker';
-import { ROBOTS } from '../../utils/constants';
+import { ROBOTS_VISUAL_DATA } from '../../utils/constants';
 
 console.log('process.env.REACT_APP_API_URL', process.env.REACT_APP_API_URL);
 export const api = createApi({
@@ -11,6 +11,9 @@ export const api = createApi({
   endpoints: (build) => ({
     getSchedulesGroupsAndMethodsMap: build.query({
       query: () => '/getSchedulesGroupsAndMethodsMap',
+    }),
+    getWarehouseMetaData: build.query({
+      query: () => '/getWarehouseMetaData',
     }),
     getF35GeneralSummary: build.query({
       query: (date) => `/getF35GeneralSummary?date=${date}`,
@@ -24,7 +27,7 @@ export const api = createApi({
       query: () => '/getRobotsErrorInfo',
       transformResponse: (response) => {
         const errors = [];
-        ROBOTS.forEach((robot) => {
+        ROBOTS_VISUAL_DATA.forEach((robot) => {
           const robotErrorList = response?.[robot.name];
           if (robotErrorList) {
             robotErrorList.forEach((error) => {
@@ -45,12 +48,37 @@ export const api = createApi({
         return errors;
       },
     }),
+    searchOrdersInF35: build.query({
+      query: ({ orders, filter }) => {
+        const queryParams = new URLSearchParams();
+        queryParams.append('filter', JSON.stringify(filter));
+        queryParams.append('orders', orders.join(','));
+        return `/searchOrdersInfo?${queryParams}`;
+      },
+      transformResponse: (response) => {
+        const orders = response?.data || [];
+        const orderList = orders.map((order) => ({
+          id: order.id,
+          orderId: order.order_id,
+          so: order.so,
+          warehouseId: order.warehouseId,
+          orderStatus: order.order_status,
+          customerEmail: order.customer_email,
+          schedules: order.schedules,
+          schedulesStatuses: order.statuses,
+          createdAt: order.created_at,
+        }));
+        return orderList;
+      },
+    }),
   }),
 });
 
 export const {
   useGetSchedulesGroupsAndMethodsMapQuery,
+  useGetWarehouseMetaDataQuery,
   useGetF35GeneralSummaryQuery,
   useGetSummaryEfficiencyByRobotQuery,
   useRobotsErrorInfoQuery,
+  useSearchOrdersInF35Query,
 } = api;

@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   searched: [],
-  list: [],
   filter: {
     minDate: '',
     maxDate: '',
@@ -10,7 +9,7 @@ const initialState = {
     status: '',
     paginator: {
       page: 0,
-      rowsPerPage: 10,
+      rowsPerPage: 50,
     },
   },
 };
@@ -25,12 +24,9 @@ const searchedOrdersSlice = createSlice({
     searchOrdersFilterUpdated(state, action) {
       state.filter = action.payload;
     },
-    listOrdersUpdated(state, action) {
-      state.list = action.payload;
-    },
   },
 });
 
-export const { searchOrdersUpdated, searchOrdersFilterUpdated, listOrdersUpdated } = searchedOrdersSlice.actions;
+export const { searchOrdersUpdated, searchOrdersFilterUpdated } = searchedOrdersSlice.actions;
 
 export default searchedOrdersSlice.reducer;
