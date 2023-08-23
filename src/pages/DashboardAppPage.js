@@ -6,16 +6,14 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // sections
 import {
-  AppConversionRates,
   AppErrorList,
-  AppTasks,
   AppWidgetSummary,
   DonutChartPanel,
   LineChartsRobotsSummary,
   PieChartRobotStat
 } from "../sections/@dashboard/app";
 import apiService from "../services/apiService";
-import { STATUS_COLORS } from "../utils/constants";
+import { F35_ROBOTS, STATUS_COLORS } from "../utils/constants";
 import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
 import { addNotification } from "../redux/notificationsSlice";
 import {
@@ -48,28 +46,28 @@ export default function DashboardAppPage() {
     data: doSummaryStats,
     isLoading: loadingDoSummaryStats,
     isFetching: fetchingDoSummaryStats,
-  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'DO' });
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.DO });
   if (doSummaryStats) console.log(`Response of doSummaryStats`, doSummaryStats);
 
   const {
     data: zincSummaryStats,
     isLoading: loadingZincSummaryStats,
     isFetching: fetchingZincSummaryStats,
-  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Zinc' });
-  if (zincSummaryStats) console.log(`Response of zincSummaryStats`, zincSummaryStats);
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.ZINC_AMZ });
+  if (zincSummaryStats) console.log(`Response of zincAMZSummaryStats`, zincSummaryStats);
 
   const {
     data: ebaySummaryStats,
     isLoading: loadingEbaySummaryStats,
     isFetching: fetchingEbaySummaryStats,
-  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Ebay' });
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.EBAY });
   if (ebaySummaryStats) console.log(`Response of ebaySummaryStats`, ebaySummaryStats);
 
   const {
     data: miraSummaryStats,
     isLoading: loadingMiraSummaryStats,
     isFetching: fetchingMiraSummaryStats,
-  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Mira' });
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.MIRA });
   if (miraSummaryStats) console.log(`Response of miraSummaryStats`, miraSummaryStats);
 
   const { data: robotsErrorInfo, isLoading: loadingRobotsErrors } = useRobotsErrorInfoQuery();
@@ -159,8 +157,8 @@ export default function DashboardAppPage() {
                 title="Robots summary"
                 subheader="Select a criteria to see the summary"
                 chartLabels={
-                  summaryEfficiencyByRange && summaryEfficiencyByRange.DO
-                    ? summaryEfficiencyByRange?.DO.map((item) => item.date)
+                  summaryEfficiencyByRange && summaryEfficiencyByRange.do
+                    ? summaryEfficiencyByRange?.do.map((item) => item.date)
                     : []
                 }
                 chartData={Object.keys(summaryEfficiencyByRange).map((key) => ({
@@ -174,35 +172,35 @@ export default function DashboardAppPage() {
                 onCriteriaChange={(criteria) => setSummaryEfficiencyCriteriaChartValue(criteria)}
               />
 
-              <AppConversionRates
-                title="Purchases by Countries"
-                subheader="(+43%) than last year"
-                chartData={[
-                  { label: 'Italy', value: 400 },
-                  { label: 'Japan', value: 430 },
-                  { label: 'China', value: 448 },
-                  { label: 'Canada', value: 470 },
-                  { label: 'France', value: 540 },
-                  { label: 'Germany', value: 580 },
-                  { label: 'South Korea', value: 690 },
-                  { label: 'Netherlands', value: 1100 },
-                  { label: 'United States', value: 1200 },
-                  { label: 'United Kingdom', value: 1380 },
-                ]}
-              />
+              {/* <AppConversionRates */}
+              {/*  title="Purchases by Countries" */}
+              {/*  subheader="(+43%) than last year" */}
+              {/*  chartData={[ */}
+              {/*    { label: 'Italy', value: 400 }, */}
+              {/*    { label: 'Japan', value: 430 }, */}
+              {/*    { label: 'China', value: 448 }, */}
+              {/*    { label: 'Canada', value: 470 }, */}
+              {/*    { label: 'France', value: 540 }, */}
+              {/*    { label: 'Germany', value: 580 }, */}
+              {/*    { label: 'South Korea', value: 690 }, */}
+              {/*    { label: 'Netherlands', value: 1100 }, */}
+              {/*    { label: 'United States', value: 1200 }, */}
+              {/*    { label: 'United Kingdom', value: 1380 }, */}
+              {/*  ]} */}
+              {/* /> */}
 
               <AppErrorList title="Errores" list={robotsErrorInfo || []} loading={loadingRobotsErrors} />
 
-              <AppTasks
-                title="Tasks"
-                list={[
-                  { id: '1', label: 'Create FireStone Logo' },
-                  { id: '2', label: 'Add SCSS and JS files if required' },
-                  { id: '3', label: 'Stakeholder Meeting' },
-                  { id: '4', label: 'Scoping & Estimations' },
-                  { id: '5', label: 'Sprint Showcase' },
-                ]}
-              />
+              {/* <AppTasks */}
+              {/*  title="Tasks" */}
+              {/*  list={[ */}
+              {/*    { id: '1', label: 'Create FireStone Logo' }, */}
+              {/*    { id: '2', label: 'Add SCSS and JS files if required' }, */}
+              {/*    { id: '3', label: 'Stakeholder Meeting' }, */}
+              {/*    { id: '4', label: 'Scoping & Estimations' }, */}
+              {/*    { id: '5', label: 'Sprint Showcase' }, */}
+              {/*  ]} */}
+              {/* /> */}
             </Stack>
           </Grid>
 
@@ -249,7 +247,7 @@ export default function DashboardAppPage() {
               />
 
               <PieChartRobotStat
-                title="Zinc today"
+                title="Zinc AMZ today"
                 total={parseInt(zincSummaryStats?.Total, 10) || 0}
                 effectiveness={parseInt(zincSummaryStats?.Effectiveness, 10) || 0}
                 chartData={[

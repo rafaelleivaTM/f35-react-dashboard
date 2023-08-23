@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import Iconify from '../iconify';
-import { getScheduleCronInterval } from '../../utils/constants';
+import { F35_ROBOTS, getScheduleCronInterval } from '../../utils/constants';
 import { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus } from '../../redux/appConfigSlice';
 import { getDateFormatted } from '../../utils/formatTime';
 import {
@@ -23,10 +23,13 @@ const CronRefreshStats = () => {
 
   const date = getDateFormatted();
   const { refetch: refetchF35GeneralSummary } = useGetF35GeneralSummaryQuery(date);
-  const { refetch: refetchDoSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'DO' });
-  const { refetch: refetchZincSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Zinc' });
-  const { refetch: refetchEbaySummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Ebay' });
-  const { refetch: refetchMiraSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: 'Mira' });
+  const { refetch: refetchDoSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.DO });
+  const { refetch: refetchZincSummaryStats } = useGetSummaryEfficiencyByRobotQuery({
+    date,
+    robot: F35_ROBOTS.ZINC_AMZ,
+  });
+  const { refetch: refetchEbaySummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.EBAY });
+  const { refetch: refetchMiraSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.MIRA });
   const { refetch: refetchRobotsErrorInfo } = useRobotsErrorInfoQuery(undefined);
 
   useEffect(() => {

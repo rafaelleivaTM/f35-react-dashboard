@@ -1,33 +1,57 @@
+export const F35_ROBOTS = {
+  DO: 'do',
+  ZINC_AMZ: 'zincAMZ',
+  ZINC_WRT: 'zincWRT',
+  ZINC_WRT_SA: 'zincWRTSA',
+  EBAY: 'ebay',
+  MIRA: 'mira',
+  STOCK: 'stock',
+};
 export const ROBOTS_VISUAL_DATA = [
   {
     id: 1,
     displayAvatarCode: 'DO',
-    name: 'DO',
+    name: 'do',
     color: '#2735ef',
   },
   {
     id: 2,
     displayAvatarCode: 'ZINC',
-    name: 'ZINC',
+    name: 'zincAMZ',
     color: '#8bc3ea',
   },
   {
     id: 3,
     displayAvatarCode: 'EBAY',
-    name: 'EBAY',
+    name: 'ebay',
     color: '#ed52d9',
   },
   {
     id: 4,
-    displayAvatarCode: 'MIRA',
-    name: 'MIRA',
-    color: '#a04406',
+    displayAvatarCode: 'ZWRT',
+    name: 'zincWRT',
+    color: '#70ab32',
+    active: false,
   },
   {
     id: 5,
+    displayAvatarCode: 'ZWRT',
+    name: 'zincWRTSA',
+    color: '#F2EA98FF',
+    active: false,
+  },
+  {
+    id: 6,
+    displayAvatarCode: 'MIRA',
+    name: 'mira',
+    color: '#a04406',
+  },
+  {
+    id: 7,
     displayAvatarCode: 'STOCK',
-    name: 'STOCK',
+    name: 'stock',
     color: '#907f3b',
+    active: false,
   },
 ];
 
