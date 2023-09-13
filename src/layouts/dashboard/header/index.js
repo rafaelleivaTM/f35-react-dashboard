@@ -12,6 +12,7 @@ import AccountPopover from "./AccountPopover";
 import NotificationsPopover from "./NotificationsPopover";
 import { DateRangePickerToolbar } from "./DateRangePickerToolbar";
 import CronRefreshStats from "../../../components/scheduler_api_call/CronRefreshStats";
+import LanguagePopover from "./LanguagePopover";
 
 // ----------------------------------------------------------------------
 
@@ -73,7 +74,7 @@ export default function Header({ onOpenNav }) {
           <Divider orientation={'vertical'} variant={'middle'} flexItem />
           <DateRangePickerToolbar />
           <Divider orientation={'vertical'} variant={'middle'} flexItem />
-          {/* <LanguagePopover /> */}
+          <LanguagePopover />
           <NotificationsPopover />
           <AccountPopover />
         </Stack>
