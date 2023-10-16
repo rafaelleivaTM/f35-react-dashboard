@@ -28,7 +28,7 @@ export const api = createApi({
       transformResponse: (response) => {
         const errors = [];
         ROBOTS_VISUAL_DATA.forEach((robot) => {
-          const robotErrorList = response?.[robot.name];
+          const robotErrorList = response?.data?.[robot.name];
           if (robotErrorList) {
             robotErrorList.forEach((error) => {
               errors.push({
@@ -39,7 +39,7 @@ export const api = createApi({
                 robotCode: robot.displayAvatarCode,
                 color: robot.color,
                 postedAt: faker.date.recent().toISOString(),
-                count: error.count,
+                count: error.count.toString(),
               });
             });
           }
