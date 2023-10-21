@@ -179,54 +179,74 @@ export default function OrdersPage() {
   };
 
   const getRobotInfo = (id) => {
-    const robotName = f35SchedulesMetadata.find((robot) => robot.id === id)?.method_code;
-    const robotData = ROBOTS_VISUAL_DATA.find((r) => r.name.toLowerCase() === robotName.toLowerCase());
-    return robotData ? { avatar: robotData.displayAvatarCode, color: robotData.color } : undefined;
+    const robotName = f35SchedulesMetadata.find((robot) => robot.id === id)?.method_code || 'mira';
+    const robotData = ROBOTS_VISUAL_DATA.find(
+      (r) => r.name.toLowerCase() === robotName.toLowerCase() || r.displayAvatarCode === robotName.toUpperCase()
+    );
+    return robotData ? { avatar: robotData.displayAvatarCode, color: robotData.color } : {};
   };
 
   const displayRobots = (schedules) => {
     const robotsIds = schedules ? schedules.trim().split(',') : [];
     return (
       <Stack spacing={1} direction={'row'}>
-        {robotsIds.map((robotId, index) =>
-          getRobotInfo(robotId) ? (
+        {robotsIds
+          .map((robotId, index) => ({ info: getRobotInfo(robotId), index }))
+          .filter(({ info }) => info)
+          .map(({ info, index }) => (
             <Box key={index}>
-              <LetterAvatar name={getRobotInfo(robotId)?.avatar} color={getRobotInfo(robotId)?.color} />
+              <LetterAvatar name={info.avatar} color={info.color} />
             </Box>
-          ) : (
-            <></>
-          )
-        )}
+          ))}
       </Stack>
     );
   };
 
   const getLabelData = (brand) => {
-    const registerBrand = BRAND_COLORS.find((b) => b.code === brand);
-    const customColor = registerBrand ? registerBrand.color : ROBOTS_VISUAL_DATA.find((r) => r.name === 'MIRA')?.color;
-    const label = registerBrand ? brand : getAbbreviation(brand);
-    return { customColor, label };
+    try {
+      const registerBrand = BRAND_COLORS.find((b) => b.code === brand);
+      const customColor = registerBrand
+        ? registerBrand.color
+        : ROBOTS_VISUAL_DATA.find((r) => r.name === 'MIRA')?.color;
+      const label = registerBrand ? brand : getAbbreviation(brand);
+      if (!label) {
+        throw new Error(`Label is not defined for brand: ${brand}`);
+      }
+      return { customColor, label };
+    } catch (e) {
+      console.log(`Error getLabelData of brand: ${brand}`);
+      console.log(e);
+      return { customColor: 'rgba(62,61,61,0.33)', label: brand };
+    }
   };
 
   const getBrandTooltip = (schedules) => {
     const robotsIds = schedules ? schedules.trim().split(',') : [];
-    const brands = robotsIds.map((robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_name);
+    const brands = robotsIds.map(
+      (robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_name || 'mira'
+    );
     const uniqueBrands = [...new Set(brands)];
     return uniqueBrands.join(', ');
   };
 
   const displayBrands = (schedules) => {
     const robotsIds = schedules ? schedules.trim().split(',') : [];
-    const brands = robotsIds.map((robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_code);
+    const brands = robotsIds.map(
+      (robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_code || 'mira'
+    );
     const uniqueBrands = [...new Set(brands)];
     const tooltipText = getBrandTooltip(schedules);
     return (
       <Stack>
-        {uniqueBrands.map((brand, index) => (
-          <Tooltip key={index} title={tooltipText}>
-            <Label customColor={getLabelData(brand).customColor}>{sentenceCase(getLabelData(brand).label)}</Label>
-          </Tooltip>
-        ))}
+        {uniqueBrands.map((brand, index) =>
+          brand ? (
+            <Tooltip key={index} title={tooltipText}>
+              <Label customColor={getLabelData(brand).customColor}>{sentenceCase(getLabelData(brand).label)}</Label>
+            </Tooltip>
+          ) : (
+            <></>
+          )
+        )}
       </Stack>
     );
   };
@@ -278,6 +298,9 @@ export default function OrdersPage() {
                       createdAt,
                     } = row;
                     const selectedUser = selected.indexOf(id) !== -1;
+                    if (orderId === '201540021') {
+                      console.log('row', row);
+                    }
 
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
