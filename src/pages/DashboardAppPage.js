@@ -35,12 +35,24 @@ export default function DashboardAppPage() {
   const [summaryEfficiencyByRange, setSummaryEfficiencyByRange] = useState({});
   const [loadingSummaryEfficiencyByRange, setLoadingSummaryEfficiencyByRange] = useState(false);
 
+  const [totalErrorsWidget, setTotalErrorsWidget] = useState(0);
+  const [totalManualWidget, setTotalManualWidget] = useState(0);
+  const [totalSuccessfullWidget, setTotalSuccessfullWidget] = useState(0);
+
   const date = getDateFormatted();
   const {
     data: f35SummaryStats,
     isLoading: loadingF35SummaryStats,
     isFetching: fetchingF35SummaryStats,
   } = useGetF35GeneralSummaryQuery(date);
+  if (f35SummaryStats && Object.keys(f35SummaryStats).length > 0) {
+    if (f35SummaryStats?.Manual && +f35SummaryStats.Manual !== totalManualWidget) {
+      setTotalManualWidget(+f35SummaryStats.Manual);
+    }
+    if (f35SummaryStats?.Success && +f35SummaryStats.Success !== totalSuccessfullWidget) {
+      setTotalSuccessfullWidget(+f35SummaryStats.Success);
+    }
+  }
 
   const {
     data: doSummaryStats,
@@ -72,6 +84,13 @@ export default function DashboardAppPage() {
 
   const { data: robotsErrorInfo, isLoading: loadingRobotsErrors } = useRobotsErrorInfoQuery();
   if (robotsErrorInfo) console.log(`Response of robotsErrorInfo`, robotsErrorInfo);
+  if (robotsErrorInfo && robotsErrorInfo.length > 0) {
+    const sumeAllErrors = robotsErrorInfo.reduce((acc, error) => acc + parseInt(error.count, 10), 0);
+
+    if (totalErrorsWidget !== sumeAllErrors) {
+      setTotalErrorsWidget(sumeAllErrors);
+    }
+  }
 
   const [summaryEfficiencyCriteriaChartValue, setSummaryEfficiencyCriteriaChartValue] = useState('Effectiveness');
 
@@ -129,19 +148,29 @@ export default function DashboardAppPage() {
       <Container maxWidth="xl">
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
+            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:dollar-circle-filled'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
+            <AppWidgetSummary
+              title="Successfull Orders"
+              total={totalSuccessfullWidget}
+              color="success"
+              icon={'ant-design:check-circle-filled'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+            <AppWidgetSummary
+              title="Manual Orders"
+              total={totalManualWidget}
+              color="warning"
+              icon={'ant-design:solution-outlined'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
+            <AppWidgetSummary title="Errors" total={totalErrorsWidget} color="error" icon={'ant-design:bug-filled'} />
           </Grid>
 
           <Grid item xs={12} md={8} lg={9}>
@@ -149,7 +178,7 @@ export default function DashboardAppPage() {
               <BarChartSummaryRangeInfo
                 title="Summary by range"
                 subheader={`From ${dateRange.startDate} to ${dateRange.endDate}`}
-                chartData={generalSummaryByRange}
+                chartData={generalSummaryByRange || []}
                 loading={loadingGeneralSummaryByRange}
               />
 

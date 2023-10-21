@@ -1,11 +1,12 @@
 // @mui
-import PropTypes from 'prop-types';
-import { alpha, styled } from '@mui/material/styles';
-import { Card, Typography } from '@mui/material';
+import PropTypes from "prop-types";
+import { alpha, styled } from "@mui/material/styles";
+import { Card, Typography } from "@mui/material";
 // utils
-import { fShortenNumber } from '../../../utils/formatNumber';
+import CountUp from "react-countup";
+import { fShortenNumber } from "../../../utils/formatNumber";
 // components
-import Iconify from '../../../components/iconify';
+import Iconify from "../../../components/iconify";
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +35,7 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
   return (
     <Card
       sx={{
-        py: 5,
+        py: 2,
         boxShadow: 0,
         textAlign: 'center',
         color: (theme) => theme.palette[color].darker,
@@ -56,7 +57,9 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
         <Iconify icon={icon} width={24} height={24} />
       </StyledIcon>
 
-      <Typography variant="h3">{fShortenNumber(total)}</Typography>
+      <Typography variant="h5">
+        <CountUp start={0} end={fShortenNumber(total)} />
+      </Typography>
 
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
         {title}

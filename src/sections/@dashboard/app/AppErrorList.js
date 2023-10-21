@@ -12,6 +12,7 @@ import {
   Stack,
   Typography
 } from "@mui/material"; // utils
+import { useState } from "react";
 import { fDateTime } from "../../../utils/formatTime"; // components
 import Iconify from "../../../components/iconify";
 import Scrollbar from "../../../components/scrollbar";
@@ -26,14 +27,25 @@ AppErrorList.propTypes = {
   loading: PropTypes.bool,
 };
 
+const displayCollapsedErrorsCount = 5;
 export default function AppErrorList({ title, subheader, list, loading, ...other }) {
+  const [collapsedList, setCollapsedList] = useState(true);
+
+  const handeCollapsableList = () => {
+    setCollapsedList(!collapsedList);
+  };
+
+  if (list.length > displayCollapsedErrorsCount && collapsedList) {
+    list = list.slice(0, displayCollapsedErrorsCount);
+  }
+
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} action={loading ? <CircularProgress size={30} /> : <></>} />
 
       <Scrollbar sx={{ height: { xs: 340, sm: 450, lg: 600 } }}>
         <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
-          {list.map((error) => (
+          {list.map((error, index) => (
             <ErrorItem key={error.id} error={error} />
           ))}
         </Stack>
@@ -42,8 +54,13 @@ export default function AppErrorList({ title, subheader, list, loading, ...other
       <Divider />
 
       <Box sx={{ p: 2, textAlign: 'right' }}>
-        <Button size="small" color="inherit" endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
-          View all
+        <Button
+          size="small"
+          onClick={handeCollapsableList}
+          color="inherit"
+          endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}
+        >
+          {collapsedList ? 'View all' : 'View less'}
         </Button>
       </Box>
     </Card>
