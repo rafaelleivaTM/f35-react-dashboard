@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 // @mui
 import { alpha, styled } from "@mui/material/styles";
 import {
+  Button,
   CircularProgress,
   IconButton,
   InputAdornment,
@@ -12,12 +13,9 @@ import {
   Typography
 } from "@mui/material";
 // component
-import { useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useRef, useState } from "react";
 import Iconify from "../../../components/iconify";
 import { parseSearchInput } from "../../../utils/functionsUtils";
-import { searchOrdersUpdated } from "../../../redux/searchOrdersSlice";
-import { useSearchOrdersInF35Query } from "../../../redux/api/apiSlice";
 
 // ----------------------------------------------------------------------
 
@@ -49,29 +47,30 @@ const StyledSearch = styled(OutlinedInput, {
 
 // ----------------------------------------------------------------------
 
-UserListToolbar.propTypes = {
+RePurchaseListToolbar.propTypes = {
   numSelected: PropTypes.number,
-  onFilterName: PropTypes.func,
+  onFilterOrdersChange: PropTypes.func,
+  loading: PropTypes.bool,
+  vendorSelected: PropTypes.string,
 };
 
-export default function UserListToolbar({ numSelected, onFilterName }) {
+export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChange, loading, vendorSelected }) {
   const inputRef = useRef();
-  const dispatch = useDispatch();
 
-  const searchOrders = useSelector((state) => state.searchOrders.searched);
-  const filter = useSelector((state) => state.searchOrders.filter);
-  const { isFetching: loading } = useSearchOrdersInF35Query({ orders: searchOrders, filter });
+  const [searchOrders, setSearchOrders] = useState('');
 
   const onChangeInputSearchValue = (event) => {
     if (event.target.value === '') {
-      dispatch(searchOrdersUpdated([]));
       inputRef.current.querySelector('input').blur();
     } else {
       const orders = parseSearchInput(event.target.value);
-      dispatch(searchOrdersUpdated(orders));
-      onFilterName(orders, filter);
+      setSearchOrders(orders);
       inputRef.current.focus();
     }
+  };
+
+  const handleSearch = () => {
+    onFilterOrdersChange(searchOrders);
   };
 
   return (
@@ -89,7 +88,6 @@ export default function UserListToolbar({ numSelected, onFilterName }) {
         </Typography>
       ) : (
         <StyledSearch
-          value={searchOrders.join(',')}
           ref={inputRef}
           onChange={onChangeInputSearchValue}
           placeholder="Search orders..."
@@ -109,13 +107,18 @@ export default function UserListToolbar({ numSelected, onFilterName }) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Stack direction={'row'} spacing={2} alignSelf={'center'}>
+        <Stack direction={'row'} spacing={2}>
           {loading ? <CircularProgress size={30} /> : <></>}
-          <Tooltip title="Filter list">
-            <IconButton>
-              <Iconify icon="ic:round-filter-list" />
-            </IconButton>
-          </Tooltip>
+          <Button
+            variant="contained"
+            color={'error'}
+            disabled={!searchOrders?.length}
+            onClick={handleSearch}
+            startIcon={<Iconify icon="eva:search-fill" />}
+            sx={{ minWidth: '105px' }}
+          >
+            Search
+          </Button>
         </Stack>
       )}
     </StyledRoot>

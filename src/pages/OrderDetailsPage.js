@@ -1,21 +1,33 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
+  Box,
   Button,
   Card,
   CardContent,
   CardHeader,
   Container,
+  Divider,
   Grid,
   IconButton,
   InputAdornment,
   OutlinedInput,
   Paper,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import { alpha, styled } from '@mui/material/styles';
+import { useState } from 'react';
 import Iconify from '../components/iconify';
+import {
+  useGetOrderFinalInfoForOrderQuery,
+  useGetOrderProductsForOrderQuery,
+  useGetOrderRobotsInfoForOrderQuery,
+  useGetOrderSchedulesForOrderQuery,
+  useGetOrderToPurchaseDataForOrderQuery,
+} from '../redux/api/apiSlice';
 
 const StyledSearch = styled(OutlinedInput, {
   shouldForwardProp: (prop) => prop !== 'hasValue',
@@ -43,23 +55,70 @@ const TagInfo = styled(Paper)(({ theme }) => ({
 
 const OrderDetailsPage = () => {
   const navigate = useNavigate();
+  const f35Statuses = useSelector((state) => state.appConfig.f35Statuses);
   const { orderId } = useParams();
   console.log('orderId in params', orderId);
 
-  const onChangeInputSearchValue = () => {};
+  const [orderInputSearch, setOrderInputSearch] = useState('');
 
-  const dataOrder = {
-    id: '1370070',
-    so: '106017535',
-    order_id: '2501136674',
-    purchase_status: '103',
-    warehouse_status: '0',
-    warehouseId: '6',
-    is_express: '0',
-    customer_email: '5toelementoproductora@gmail.com',
-    created_at: '2023-08-12 20:36:31',
-    updated_at: '2023-08-12 21:15:16',
+  const {
+    data: orderSummaryData,
+    isLoading: isLoadingOrderSummaryData,
+    isError: isErrorOrderSummaryData,
+  } = useGetOrderToPurchaseDataForOrderQuery(orderId, {
+    skip: !orderId,
+  });
+  const {
+    data: orderSchedulesData,
+    isLoading: isLoadingOrderSchedulesData,
+    isError: isErrorOrderSchedulesData,
+  } = useGetOrderSchedulesForOrderQuery(orderId, {
+    skip: !orderId,
+  });
+  const {
+    data: orderProductsData,
+    isLoading: isLoadingOrderProductsData,
+    isError: isErrorOrderProductsData,
+  } = useGetOrderProductsForOrderQuery(orderId, {
+    skip: !orderId,
+  });
+  const {
+    data: orderFinalInfoData,
+    isLoading: isLoadingOrderFinalInfoData,
+    isError: isErrorOrderFinalInfoData,
+  } = useGetOrderFinalInfoForOrderQuery(orderId, {
+    skip: !orderId,
+  });
+  const {
+    data: orderRobotsInfoData,
+    isLoading: isLoadingOrderRobotsInfoData,
+    isError: isErrorOrderRobotsInfoData,
+  } = useGetOrderRobotsInfoForOrderQuery(orderId, {
+    skip: !orderId,
+  });
+
+  const onChangeInputSearchValue = (event) => {
+    setOrderInputSearch(event.target.value);
   };
+
+  const handleSearch = () => {
+    console.log('Searching info of order', orderId);
+    // set orderId in params
+    navigate(`/dashboard/order-details/${orderInputSearch}`);
+  };
+
+  const renderValue = (property, value) => {
+    if (value === null || value === undefined || value === '') {
+      return '\u00A0';
+    }
+
+    if (property.toLowerCase() === 'status') {
+      return f35Statuses[value] || value;
+    }
+
+    return value;
+  };
+
   return (
     <>
       <Helmet>
@@ -86,29 +145,180 @@ const OrderDetailsPage = () => {
             }
           />
 
-          <Button variant="contained" color={'error'} startIcon={<Iconify icon="eva:search-fill" />}>
+          <Button
+            variant="contained"
+            color={'error'}
+            disabled={!orderInputSearch}
+            onClick={handleSearch}
+            startIcon={<Iconify icon="eva:search-fill" />}
+          >
             Search
           </Button>
         </Stack>
 
-        <Card>
+        <Card sx={{ mb: 2 }}>
           <CardHeader title={'General information'} />
 
           <CardContent>
-            <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
-              {Object.keys(dataOrder).map((prop, index) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={index} sx={{}}>
-                  <TagInfo elevation={3}>
-                    <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
-                      <Typography variant={'body2'}>{prop}</Typography>
-                      <Typography variant={'subtitle2'} sx={{ wordBreak: 'break-all', fontSize: '100%' }}>
-                        {dataOrder[prop]}
-                      </Typography>
-                    </Stack>
-                  </TagInfo>
-                </Grid>
-              ))}
-            </Grid>
+            {isLoadingOrderSummaryData ? (
+              <Box display={'flex'}>
+                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
+              </Box>
+            ) : (
+              <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
+                {orderSummaryData &&
+                  Object.keys(orderSummaryData).map((prop, index) => (
+                    <Grid item xs={12} sm={'auto'} key={index} sx={{ '&': { maxWidth: '100% !important' } }}>
+                      <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
+                        <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
+                          <Typography variant={'body2'}>{prop}</Typography>
+                          <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
+                            {renderValue(prop, orderSummaryData[prop])}
+                          </Typography>
+                        </Stack>
+                      </TagInfo>
+                    </Grid>
+                  ))}
+              </Grid>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card sx={{ mb: 2 }}>
+          <CardHeader title={'Schedules'} />
+
+          <CardContent>
+            {isLoadingOrderSchedulesData ? (
+              <Box display={'flex'}>
+                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
+              </Box>
+            ) : (
+              orderSchedulesData &&
+              orderSchedulesData.length > 0 &&
+              orderSchedulesData.map((schedule, indexS) => (
+                <div key={indexS}>
+                  <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
+                    {Object.keys(schedule).map((prop, index) => (
+                      <Grid item xs={12} sm={'auto'} key={index} sx={{ '&': { maxWidth: '100% !important' } }}>
+                        <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
+                          <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
+                            <Typography variant={'body2'}>{prop}</Typography>
+                            <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
+                              {renderValue(prop, schedule[prop])}
+                            </Typography>
+                          </Stack>
+                        </TagInfo>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  {indexS < orderSchedulesData.length - 1 && <Divider sx={{ my: 3 }} />}
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card sx={{ mb: 2 }}>
+          <CardHeader title={'Products'} />
+
+          <CardContent>
+            {isLoadingOrderProductsData ? (
+              <Box display={'flex'}>
+                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
+              </Box>
+            ) : (
+              orderProductsData &&
+              orderProductsData.length > 0 &&
+              orderProductsData.map((product, index) => (
+                <div key={index}>
+                  <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
+                    {Object.keys(product).map((prop, indexP) => (
+                      <Grid item xs={12} sm={'auto'} key={indexP} sx={{ '&': { maxWidth: '100% !important' } }}>
+                        <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
+                          <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
+                            <Typography variant={'body2'}>{prop}</Typography>
+                            <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
+                              {renderValue(prop, product[prop])}
+                            </Typography>
+                          </Stack>
+                        </TagInfo>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  {index < orderProductsData.length - 1 && <Divider sx={{ my: 3 }} />}
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card sx={{ mb: 2 }}>
+          <CardHeader title={'Final info'} />
+
+          <CardContent>
+            {isLoadingOrderFinalInfoData ? (
+              <Box display={'flex'}>
+                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
+              </Box>
+            ) : (
+              <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
+                {orderFinalInfoData &&
+                  Object.keys(orderFinalInfoData).map((prop, index) => (
+                    <Grid item xs={12} sm={'auto'} key={index} sx={{ '&': { maxWidth: '100% !important' } }}>
+                      <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
+                        <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
+                          <Typography variant={'body2'}>{prop}</Typography>
+                          <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
+                            {renderValue(prop, orderFinalInfoData[prop])}
+                          </Typography>
+                        </Stack>
+                      </TagInfo>
+                    </Grid>
+                  ))}
+              </Grid>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card sx={{ mb: 2 }}>
+          <CardHeader title={'Robot info'} />
+
+          <CardContent>
+            {isLoadingOrderRobotsInfoData ? (
+              <Box display={'flex'}>
+                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
+              </Box>
+            ) : (
+              orderRobotsInfoData &&
+              orderRobotsInfoData.length > 0 &&
+              orderRobotsInfoData.map((robot, index) => {
+                if (robot[0]) {
+                  const robotData = robot[0];
+                  const robotName = robot.robot;
+                  return (
+                    <div key={index}>
+                      <Typography variant={'h6'}>{robotName}</Typography>
+                      <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
+                        {Object.keys(robotData).map((prop, indexR) => (
+                          <Grid item xs={12} sm={'auto'} key={indexR} sx={{ '&': { maxWidth: '100% !important' } }}>
+                            <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
+                              <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
+                                <Typography variant={'body2'}>{prop}</Typography>
+                                <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
+                                  {renderValue(prop, robotData[prop])}
+                                </Typography>
+                              </Stack>
+                            </TagInfo>
+                          </Grid>
+                        ))}
+                      </Grid>
+                      {index < orderRobotsInfoData.length - 1 && <Divider sx={{ my: 3 }} />}
+                    </div>
+                  );
+                }
+                return <div key={index} />;
+              })
+            )}
           </CardContent>
         </Card>
       </Container>

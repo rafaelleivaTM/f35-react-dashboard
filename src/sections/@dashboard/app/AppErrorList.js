@@ -41,7 +41,12 @@ export default function AppErrorList({ title, subheader, list, loading, ...other
 
   return (
     <Card {...other}>
-      <CardHeader title={title} subheader={subheader} action={loading ? <CircularProgress size={30} /> : <></>} />
+      <CardHeader
+        title={title}
+        subheader={subheader}
+        sx={{ '& .MuiCardHeader-action': { alignSelf: 'center', m: 0, display: 'flex' } }}
+        action={loading ? <CircularProgress size={30} /> : <></>}
+      />
 
       <Scrollbar sx={{ height: { xs: 340, sm: 450, lg: 600 } }}>
         <Stack spacing={3} sx={{ p: 3, pr: 0 }}>

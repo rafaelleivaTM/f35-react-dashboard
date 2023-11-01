@@ -9,6 +9,27 @@ const initialState = {
   cronRefreshStatsStatus: appConfigStorage.cronRefreshStatsStatus || false,
   f35SchedulesMetadata: appConfigStorage.f35SchedulesMetadata || [],
   warehouseMetadata: appConfigStorage.warehouseMetadata || [],
+  f35Statuses: {
+    1: 'PENDING',
+    2: 'WAITING_PAYMENT',
+    20: 'BUYING',
+    21: 'RETRY',
+    22: 'CONFIRMATION_RETRY',
+    24: 'PURCHASE_SUCCESS',
+    25: 'PENDING_ABORT',
+    26: 'RETRY_CONNECTION_FAIL',
+    27: 'REGISTER_FAIL',
+    101: 'MANUAL',
+    102: 'WARNING',
+    103: 'COMPLETED',
+    104: 'FAIL',
+    105: 'CANCELLED',
+    106: 'CANCELLED_INTERN_CLIENT',
+    107: 'CANCELLED_CLIENT',
+    108: 'CANCELLED_PAYMENT',
+    109: 'FAIL_TO_MANUAL',
+    110: 'SKIPPED',
+  },
 };
 
 const appConfigSlice = createSlice({

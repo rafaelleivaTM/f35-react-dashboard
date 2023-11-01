@@ -6,7 +6,7 @@ console.log('process.env.REACT_APP_API_URL', process.env.REACT_APP_API_URL);
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     // Fill in your own server starting URL here
-    baseUrl: process.env.REACT_APP_API_URL,
+    baseUrl: `${process.env.REACT_APP_API_URL}/f35/data`,
   }),
   endpoints: (build) => ({
     getSchedulesGroupsAndMethodsMap: build.query({
@@ -71,6 +71,26 @@ export const api = createApi({
         return orderList;
       },
     }),
+    getOrderToPurchaseDataForOrder: build.query({
+      query: (orderId) => `/getOrderToPurchaseData?order=${orderId}`,
+      transformResponse: (response) => response?.data?.[0],
+    }),
+    getOrderSchedulesForOrder: build.query({
+      query: (orderId) => `/getOrderSchedules?order=${orderId}`,
+      transformResponse: (response) => response?.data || [],
+    }),
+    getOrderProductsForOrder: build.query({
+      query: (orderId) => `/getOrderProducts?order=${orderId}`,
+      transformResponse: (response) => response?.data || [],
+    }),
+    getOrderFinalInfoForOrder: build.query({
+      query: (orderId) => `/getOrderFinalInfo?order=${orderId}`,
+      transformResponse: (response) => response?.data?.[0],
+    }),
+    getOrderRobotsInfoForOrder: build.query({
+      query: (orderId) => `/getOrderRobotsInfo?order=${orderId}`,
+      transformResponse: (response) => response?.data || [],
+    }),
   }),
 });
 
@@ -81,4 +101,9 @@ export const {
   useGetSummaryEfficiencyByRobotQuery,
   useRobotsErrorInfoQuery,
   useSearchOrdersInF35Query,
+  useGetOrderToPurchaseDataForOrderQuery,
+  useGetOrderSchedulesForOrderQuery,
+  useGetOrderProductsForOrderQuery,
+  useGetOrderFinalInfoForOrderQuery,
+  useGetOrderRobotsInfoForOrderQuery,
 } = api;

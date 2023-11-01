@@ -3,13 +3,14 @@ import { Navigate, useRoutes } from "react-router-dom";
 import DashboardLayout from "./layouts/dashboard";
 import SimpleLayout from "./layouts/simple";
 //
-import BlogPage from "./pages/BlogPage";
 import OrdersPage from "./pages/OrdersPage";
 import LoginPage from "./pages/LoginPage";
 import Page404 from "./pages/Page404";
 import ProductsPage from "./pages/ProductsPage";
 import DashboardAppPage from "./pages/DashboardAppPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
+import RePurchasePage from "./pages/RePurchasePage";
+import ToolsPage from "./pages/Tools";
 
 // ----------------------------------------------------------------------
 
@@ -23,8 +24,9 @@ export default function Router() {
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'orders', element: <OrdersPage /> },
         { path: 'order-details/:orderId', element: <OrderDetailsPage /> },
+        { path: 're-buy', element: <RePurchasePage /> },
         { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        { path: 'tools', element: <ToolsPage /> },
       ],
     },
     {

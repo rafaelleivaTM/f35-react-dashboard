@@ -3,6 +3,7 @@ import { HelmetProvider } from "react-helmet-async";
 // routes
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { io } from "socket.io-client";
 import Router from "./routes";
 // theme
 import ThemeProvider from "./theme";
@@ -14,6 +15,11 @@ import { updateF35SchedulesMetadata, updateWarehouseMetadata } from "./redux/app
 
 // ----------------------------------------------------------------------
 
+export const SOCKET = io(process.env.REACT_APP_API_URL, {
+  reconnectionAttempts: 5,
+  reconnectionDelayMax: 50000,
+});
+
 export default function App() {
   const dispatch = useDispatch();
   const warehouseMetadata = useSelector((state) => state.appConfig.warehouseMetadata);
@@ -24,6 +30,15 @@ export default function App() {
   const { data: f35SchedulesMetadataResponse } = useGetSchedulesGroupsAndMethodsMapQuery(undefined, {
     skip: f35SchedulesMetadata.length > 0,
   });
+
+  useEffect(() => {
+    SOCKET.on('connect_error', (err) => {
+      console.log(
+        `Error de conexión, no se pudo establecer conexión con web-socket en el server: ${process.env.REACT_APP_API_URL}:`,
+        err.message
+      );
+    });
+  }, []);
 
   useEffect(() => {
     if (f35SchedulesMetadataResponse) {

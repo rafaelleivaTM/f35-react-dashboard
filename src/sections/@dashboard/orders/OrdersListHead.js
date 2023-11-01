@@ -16,7 +16,7 @@ const visuallyHidden = {
   clip: 'rect(0 0 0 0)',
 };
 
-UserListHead.propTypes = {
+OrdersListHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
   rowCount: PropTypes.number,
@@ -26,15 +26,7 @@ UserListHead.propTypes = {
   onSelectAllClick: PropTypes.func,
 };
 
-export default function UserListHead({
-  order,
-  orderBy,
-  rowCount,
-  headLabel,
-  numSelected,
-  onRequestSort,
-  onSelectAllClick,
-}) {
+export default function OrdersListHead({ order, orderBy, headLabel, onRequestSort }) {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -42,13 +34,6 @@ export default function UserListHead({
   return (
     <TableHead>
       <TableRow>
-        {/* <TableCell padding="checkbox"> */}
-        {/*  <Checkbox */}
-        {/*    indeterminate={numSelected > 0 && numSelected < rowCount} */}
-        {/*    checked={rowCount > 0 && numSelected === rowCount} */}
-        {/*    onChange={onSelectAllClick} */}
-        {/*  /> */}
-        {/* </TableCell> */}
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}

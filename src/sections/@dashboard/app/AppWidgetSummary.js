@@ -4,6 +4,7 @@ import { alpha, styled } from "@mui/material/styles";
 import { Card, Typography } from "@mui/material";
 // utils
 import CountUp from "react-countup";
+import { useEffect, useRef } from "react";
 import { fShortenNumber } from "../../../utils/formatNumber";
 // components
 import Iconify from "../../../components/iconify";
@@ -32,6 +33,12 @@ AppWidgetSummary.propTypes = {
 };
 
 export default function AppWidgetSummary({ title, total, icon, color = 'primary', sx, ...other }) {
+  const startRef = useRef(total);
+
+  useEffect(() => {
+    startRef.current = total;
+  }, [total]);
+
   return (
     <Card
       sx={{
@@ -58,7 +65,7 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
       </StyledIcon>
 
       <Typography variant="h5">
-        <CountUp start={0} end={fShortenNumber(total)} />
+        <CountUp start={startRef.current} end={fShortenNumber(total)} />
       </Typography>
 
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>

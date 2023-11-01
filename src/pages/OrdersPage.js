@@ -26,13 +26,13 @@ import { useNavigate } from "react-router-dom";
 import Label from "../components/label";
 import Iconify from "../components/iconify";
 import Scrollbar from "../components/scrollbar"; // sections
-import { UserListHead, UserListToolbar } from "../sections/@dashboard/user"; // mock
 import USERLIST from "../_mock/user";
 import { searchOrdersFilterUpdated } from "../redux/searchOrdersSlice";
 import { BRAND_COLORS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_DATA } from "../utils/constants";
 import LetterAvatar from "../components/letter-avatar";
 import { getAbbreviation } from "../utils/functionsUtils";
 import { useSearchOrdersInF35Query } from "../redux/api/apiSlice";
+import { OrdersListHead, OrdersListToolbar } from "../sections/@dashboard/orders";
 
 // ----------------------------------------------------------------------
 
@@ -109,12 +109,6 @@ export default function OrdersPage() {
 
   const [rowsPerPage] = useState(filter.paginator.rowsPerPage || 50);
 
-  // const [orderList, setOrderList] = useState([]);
-
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
-
   const handleCloseMenu = () => {
     setOpen(null);
   };
@@ -123,30 +117,6 @@ export default function OrdersPage() {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -179,7 +149,7 @@ export default function OrdersPage() {
   };
 
   const getRobotInfo = (id) => {
-    const robotName = f35SchedulesMetadata.find((robot) => robot.id === id)?.method_code || 'mira';
+    const robotName = f35SchedulesMetadata.find((robot) => robot.id === +id)?.method_code || 'mira';
     const robotData = ROBOTS_VISUAL_DATA.find(
       (r) => r.name.toLowerCase() === robotName.toLowerCase() || r.displayAvatarCode === robotName.toUpperCase()
     );
@@ -223,7 +193,7 @@ export default function OrdersPage() {
   const getBrandTooltip = (schedules) => {
     const robotsIds = schedules ? schedules.trim().split(',') : [];
     const brands = robotsIds.map(
-      (robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_name || 'mira'
+      (robotId) => f35SchedulesMetadata.find((robot) => robot.id === +robotId)?.group_name || 'mira'
     );
     const uniqueBrands = [...new Set(brands)];
     return uniqueBrands.join(', ');
@@ -232,7 +202,7 @@ export default function OrdersPage() {
   const displayBrands = (schedules) => {
     const robotsIds = schedules ? schedules.trim().split(',') : [];
     const brands = robotsIds.map(
-      (robotId) => f35SchedulesMetadata.find((robot) => robot.id === robotId)?.group_code || 'mira'
+      (robotId) => f35SchedulesMetadata.find((robot) => robot.id === +robotId)?.group_code || 'mira'
     );
     const uniqueBrands = [...new Set(brands)];
     const tooltipText = getBrandTooltip(schedules);
@@ -251,7 +221,7 @@ export default function OrdersPage() {
     );
   };
 
-  const getWareHouseName = (id) => warehouseMetadata.find((w) => w.id === id)?.name;
+  const getWareHouseName = (id) => warehouseMetadata.find((w) => +w.id === id)?.name;
 
   return (
     <>
@@ -264,25 +234,21 @@ export default function OrdersPage() {
           <Typography variant="h4" gutterBottom>
             Orders
           </Typography>
-          {/* <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}> */}
-          {/*  New User */}
-          {/* </Button> */}
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <OrdersListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead
+                <OrdersListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
                   rowCount={listedOrders?.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {listedOrders.map((row) => {
@@ -298,15 +264,9 @@ export default function OrdersPage() {
                       createdAt,
                     } = row;
                     const selectedUser = selected.indexOf(id) !== -1;
-                    if (orderId === '201540021') {
-                      console.log('row', row);
-                    }
 
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                        {/* <TableCell padding="checkbox"> */}
-                        {/*  <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} /> */}
-                        {/* </TableCell> */}
                         <TableCell padding="checkbox">{displayBrands(schedules)}</TableCell>
 
                         <TableCell component="th" scope="row">
