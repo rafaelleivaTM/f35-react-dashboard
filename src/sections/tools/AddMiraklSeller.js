@@ -3,9 +3,8 @@ import { Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextFiel
 import apiService from '../../services/apiService';
 import Iconify from '../../components/iconify';
 
-const PurchaseGroupForm = () => {
+const CreateMiraklSellerForm = () => {
   const [name, setName] = useState('');
-  const [code, setCode] = useState('');
   const [sellerId, setSellerId] = useState('');
   const [supplier, setSupplier] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +15,6 @@ const PurchaseGroupForm = () => {
 
     const purchaseGroup = {
       name,
-      code,
       seller_id: sellerId,
       supplier: +supplier,
     };
@@ -27,11 +25,10 @@ const PurchaseGroupForm = () => {
       .createPurchaseGroup(purchaseGroup)
       .then((response) => {
         console.log('response from createPurchaseGroup', response);
-        if (response?.data) {
+        if (response?.data && response.statusCode === 201) {
           setSupplier('');
           setName('');
           setSellerId('');
-          setCode('');
           setSuccessFullCreation(true);
         } else {
           setSuccessFullCreation(false);
@@ -49,7 +46,7 @@ const PurchaseGroupForm = () => {
   return (
     <Card>
       <CardHeader
-        title={'Create Purchase Group'}
+        title={'Add Mirakl Seller'}
         action={
           loading ? (
             <CircularProgress size={30} />
@@ -65,11 +62,8 @@ const PurchaseGroupForm = () => {
       <CardContent>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField label="Code" value={code} onChange={(e) => setCode(e.target.value)} required />
+            <Grid item xs={12} sm={12}>
+              <TextField fullWidth label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField label="Seller ID" value={sellerId} onChange={(e) => setSellerId(e.target.value)} required />
@@ -88,12 +82,7 @@ const PurchaseGroupForm = () => {
               />
             </Grid>
             <Grid item xs={12} display={'flex'} justifyContent={'flex-end'} sx={{ mr: 1 }}>
-              <Button
-                type="submit"
-                color={'error'}
-                variant="contained"
-                disabled={!name || !code || !sellerId || !supplier}
-              >
+              <Button type="submit" color={'error'} variant="contained" disabled={!name || !sellerId || !supplier}>
                 Submit
               </Button>
             </Grid>
@@ -104,4 +93,4 @@ const PurchaseGroupForm = () => {
   );
 };
 
-export default PurchaseGroupForm;
+export default CreateMiraklSellerForm;

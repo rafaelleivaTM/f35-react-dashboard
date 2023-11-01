@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 // components
 // sections
 import { Container, Grid } from "@mui/material";
-import PurchaseGroup from "../sections/tools/PurchaseGroup";
+import CreateMiraklSellerForm from "../sections/tools/AddMiraklSeller";
 
 // ---------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ export default function ToolsPage() {
       <Container maxWidth="xl">
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-            <PurchaseGroup />
+            <CreateMiraklSellerForm />
           </Grid>
         </Grid>
       </Container>
