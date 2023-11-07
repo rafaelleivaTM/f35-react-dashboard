@@ -8,3 +8,4 @@ export { default as AppWidgetSummary } from './AppWidgetSummary';
 export { default as AppCurrentSubject } from './AppCurrentSubject';
 export { default as AppConversionRates } from './AppConversionRates';
 export { default as PieChartRobotStat } from './PieChartRobotStat';
+export { default as AppIncomingOrders } from './AppIncomingOrders';

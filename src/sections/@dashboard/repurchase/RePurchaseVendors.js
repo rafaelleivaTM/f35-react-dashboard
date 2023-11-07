@@ -46,15 +46,17 @@ export default function ReBuyVendorsSelect({ vendorSelected, venderSelectedHandl
         disableRipple
         onClick={handleOpen}
         endIcon={<Iconify icon={open ? 'eva:chevron-up-fill' : 'eva:chevron-down-fill'} />}
-        sx={{ width: '185px' }}
+        sx={{ width: '210px' }}
       >
-        Vendor:&nbsp;
+        <Typography component="span" variant="h6">
+          Vendor:&nbsp;
+        </Typography>
         <Typography
           component="span"
-          variant="subtitle2"
+          variant="subtitle1"
           sx={{
             color: 'text.secondary',
-            width: '72px', // Establece el ancho que desees aquí
+            width: '92px', // Establece el ancho que desees aquí
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',

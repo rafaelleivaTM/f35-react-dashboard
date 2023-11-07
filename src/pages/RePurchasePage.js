@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { filter } from "lodash";
 import { sentenceCase } from "change-case";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // @mui
 import {
   Box,
@@ -30,11 +30,11 @@ import Scrollbar from "../components/scrollbar";
 // sections
 import { RePurchaseListHead, RePurchaseListToolbar, RePurchaseOptions } from "../sections/@dashboard/repurchase";
 
-import USERLIST from "../_mock/user";
 import apiService from "../services/apiService";
-import { BRAND_COLORS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_DATA } from "../utils/constants";
+import { BRAND_COLORS, F35_ROBOTS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_DATA } from "../utils/constants";
 import { getAbbreviation } from "../utils/functionsUtils";
 import LetterAvatar from "../components/letter-avatar";
+import { useDeleteSchedulesMutation } from "../redux/api/apiSlice";
 
 // ----------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ export default function RePurchasePage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [rePurchaseWithVendor, setRePurchaseWithVendor] = useState('');
 
@@ -103,6 +103,60 @@ export default function RePurchasePage() {
   const [repurchasingOrders, setRepurchasingOrders] = useState(false);
 
   const f35SchedulesMetadata = useSelector((state) => state.appConfig.f35SchedulesMetadata);
+
+  const [deleteSchedules, { isLoading: isDeletingSchedules }] = useDeleteSchedulesMutation();
+
+  useEffect(() => {
+    if (rePurchaseWithVendor && schedulesData && schedulesData.length > 0) {
+      switch (rePurchaseWithVendor) {
+        case 'amz': {
+          selectSchedulesToRePurchase(F35_ROBOTS.ZINC_AMZ_ID);
+          break;
+        }
+        case 'ebay': {
+          selectSchedulesToRePurchase(F35_ROBOTS.EBAY_ID);
+          break;
+        }
+        case 'wrt': {
+          selectSchedulesToRePurchase(F35_ROBOTS.ZINC_WRT_ID);
+          break;
+        }
+        case 'mira': {
+          // todo
+          break;
+        }
+
+        default:
+          break;
+      }
+    }
+  }, [rePurchaseWithVendor, schedulesData]);
+
+  const deleteSchedulesAction = () => {
+    deleteSchedules(selected)
+      .then((response) => {
+        console.log('Response from deleteSchedulesAction', response);
+      })
+      .catch((error) => {
+        console.log('error from deleteSchedulesAction', error);
+      });
+  };
+
+  const deleteSingleSchedule = (id) => {
+    deleteSchedules([id])
+      .then((response) => {
+        console.log('Response from deleteSingleSchedule', response);
+      })
+      .catch((error) => {
+        console.log('error from deleteSingleSchedule', error);
+      });
+  };
+
+  const selectSchedulesToRePurchase = (robotId) => {
+    const schedules = [...schedulesData];
+    const robotSchedules = schedules.filter((sched) => sched.robot === robotId).map((sched) => sched.id);
+    setSelected(robotSchedules);
+  };
 
   const searchOrders = (orders) => {
     if (!orders) {
@@ -128,10 +182,13 @@ export default function RePurchasePage() {
   };
 
   const displayBrand = (schedule) => {
-    const brand = f35SchedulesMetadata.find((robot) => robot.id === schedule)?.group_code || 'mira';
+    if (schedule) {
+      const brand = f35SchedulesMetadata.find((robot) => robot.id === schedule)?.group_code || 'mira';
 
-    const tooltipText = getBrandTooltip(schedule.toString());
-    return brand ? <Label customColor={getLabelData(brand).customColor}>{sentenceCase(tooltipText)}</Label> : <></>;
+      const tooltipText = getBrandTooltip(schedule.toString());
+      return brand ? <Label customColor={getLabelData(brand).customColor}>{sentenceCase(tooltipText)}</Label> : <></>;
+    }
+    return <></>;
   };
 
   const getBrandTooltip = (schedules) => {
@@ -162,19 +219,23 @@ export default function RePurchasePage() {
   };
 
   const displayRobots = (schedule) => {
-    const robotsIds = schedule ? [schedule.toString()] : [];
-    return (
-      <Stack spacing={1} direction={'row'}>
-        {robotsIds
-          .map((robotId, index) => ({ info: getRobotInfo(robotId), index }))
-          .filter(({ info }) => info)
-          .map(({ info, index }) => (
-            <Box key={index}>
-              <LetterAvatar name={info.avatar} color={info.color} />
-            </Box>
-          ))}
-      </Stack>
-    );
+    if (schedule) {
+      const robotsIds = schedule ? [schedule.toString()] : [];
+      return (
+        <Stack spacing={1} direction={'row'}>
+          {robotsIds
+            .map((robotId, index) => ({ info: getRobotInfo(robotId), index }))
+            .filter(({ info }) => info)
+            .map(({ info, index }) => (
+              <Box key={index}>
+                <LetterAvatar name={info.avatar} color={info.color} />
+              </Box>
+            ))}
+        </Stack>
+      );
+    }
+
+    return <></>;
   };
 
   const getRobotInfo = (id) => {
@@ -185,7 +246,8 @@ export default function RePurchasePage() {
     return robotData ? { avatar: robotData.displayAvatarCode, color: robotData.color } : {};
   };
 
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = (event, id) => {
+    event.currentTarget.schedId = id;
     setOpen(event.currentTarget);
   };
 
@@ -201,7 +263,7 @@ export default function RePurchasePage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = schedulesData.map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -246,13 +308,13 @@ export default function RePurchasePage() {
   return (
     <>
       <Helmet>
-        <title> Re-Buy </title>
+        <title> Re-Purchase </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Re-Buy Orders
+            Re-Purchase Orders
           </Typography>
 
           <RePurchaseOptions vendorSelected={rePurchaseWithVendor} venderSelectedHandler={setRePurchaseWithVendor} />
@@ -264,6 +326,7 @@ export default function RePurchasePage() {
             onFilterOrdersChange={handleFilterAction}
             loading={searchingOrders}
             vendorSelected={rePurchaseWithVendor}
+            onDeleteSchedules={deleteSchedulesAction}
           />
 
           <Scrollbar>
@@ -296,27 +359,27 @@ export default function RePurchasePage() {
                         </TableCell>
 
                         <TableCell align="left">
-                          <Label customColor={F35_STATUS_COLORS[orderStatus]}>
-                            {sentenceCase(F35_STATUS[orderStatus])}
+                          <Label customColor={F35_STATUS_COLORS[orderStatus] || '#FFF'}>
+                            {sentenceCase(F35_STATUS[orderStatus] || '')}
                           </Label>
                         </TableCell>
 
                         <TableCell align="left">{displayBrand(robot)}</TableCell>
 
                         <TableCell align="left">
-                          <Label customColor={F35_STATUS_COLORS[scheduleStatus]}>
-                            {sentenceCase(F35_STATUS[scheduleStatus])}
+                          <Label customColor={F35_STATUS_COLORS[scheduleStatus] || '#FFF'}>
+                            {sentenceCase(F35_STATUS[scheduleStatus] || '')}
                           </Label>
                         </TableCell>
 
                         <TableCell align="center">{displayRobots(robot)}</TableCell>
 
-                        <TableCell align="left">{moment(created).format('YYYY-MM-DD HH:mm')}</TableCell>
+                        <TableCell align="left">{created ? moment(created).format('YYYY-MM-DD HH:mm') : ''}</TableCell>
 
                         <TableCell align="center">
                           <Stack direction={'row'} alignItems={'center'} spacing={1}>
                             <Iconify icon={'eva:checkmark-circle-2-fill'} sx={{ color: 'rgb(64,157,95)' }} />
-                            <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                            <IconButton size="large" color="inherit" onClick={(event) => handleOpenMenu(event, id)}>
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton>
                           </Stack>
@@ -359,9 +422,9 @@ export default function RePurchasePage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[25, 50, 100]}
             component="div"
-            count={USERLIST.length}
+            count={schedulesData.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -393,7 +456,7 @@ export default function RePurchasePage() {
           Edit
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteSingleSchedule(open.schedId)}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>

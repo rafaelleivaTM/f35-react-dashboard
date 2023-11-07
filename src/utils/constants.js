@@ -1,9 +1,14 @@
 export const F35_ROBOTS = {
   DO: 'do',
+  DO_ID: 8,
   ZINC_AMZ: 'zincAMZ',
+  ZINC_AMZ_ID: 14,
   ZINC_WRT: 'zincWRT',
+  ZINC_WRT_ID: 16,
   ZINC_WRT_SA: 'zincWRTSA',
+  ZINC_WRT_SA_ID: 26,
   EBAY: 'ebay',
+  EBAY_ID: 3,
   MIRA: 'mira',
   STOCK: 'stock',
 };

@@ -6,25 +6,25 @@ console.log('process.env.REACT_APP_API_URL', process.env.REACT_APP_API_URL);
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     // Fill in your own server starting URL here
-    baseUrl: `${process.env.REACT_APP_API_URL}/f35/data`,
+    baseUrl: `${process.env.REACT_APP_API_URL}/f35`,
   }),
   endpoints: (build) => ({
     getSchedulesGroupsAndMethodsMap: build.query({
-      query: () => '/getSchedulesGroupsAndMethodsMap',
+      query: () => '/data/getSchedulesGroupsAndMethodsMap',
     }),
     getWarehouseMetaData: build.query({
-      query: () => '/getWarehouseMetaData',
+      query: () => '/data/getWarehouseMetaData',
     }),
     getF35GeneralSummary: build.query({
-      query: (date) => `/getF35GeneralSummary?date=${date}`,
+      query: (date) => `/data/getF35GeneralSummary?date=${date}`,
       transformResponse: (response) => response?.data?.[0],
     }),
     getSummaryEfficiencyByRobot: build.query({
-      query: (params) => `/getSummaryEfficiencyByRobot?date=${params.date}&robot=${params.robot}`,
+      query: (params) => `/data/getSummaryEfficiencyByRobot?date=${params.date}&robot=${params.robot}`,
       transformResponse: (response) => response?.data?.[0],
     }),
     robotsErrorInfo: build.query({
-      query: () => '/getRobotsErrorInfo',
+      query: (dateRange) => `/data/getRobotsErrorInfo?from=${dateRange?.startDate}&to=${dateRange?.endDate}`,
       transformResponse: (response) => {
         const errors = [];
         ROBOTS_VISUAL_DATA.forEach((robot) => {
@@ -48,12 +48,16 @@ export const api = createApi({
         return errors;
       },
     }),
+    incomingOrdersByRange: build.query({
+      query: (dateRange) => `/data/getIncomingOrders?from=${dateRange?.startDate}&to=${dateRange?.endDate}`,
+      transformResponse: (response) => response?.data,
+    }),
     searchOrdersInF35: build.query({
       query: ({ orders, filter }) => {
         const queryParams = new URLSearchParams();
         queryParams.append('filter', JSON.stringify(filter));
         queryParams.append('orders', orders.join(','));
-        return `/searchOrdersInfo?${queryParams}`;
+        return `/data/searchOrdersInfo?${queryParams}`;
       },
       transformResponse: (response) => {
         const orders = response?.data || [];
@@ -72,24 +76,35 @@ export const api = createApi({
       },
     }),
     getOrderToPurchaseDataForOrder: build.query({
-      query: (orderId) => `/getOrderToPurchaseData?order=${orderId}`,
+      query: (orderId) => `/data/getOrderToPurchaseData?order=${orderId}`,
       transformResponse: (response) => response?.data?.[0],
     }),
     getOrderSchedulesForOrder: build.query({
-      query: (orderId) => `/getOrderSchedules?order=${orderId}`,
+      query: (orderId) => `/data/getOrderSchedules?order=${orderId}`,
       transformResponse: (response) => response?.data || [],
     }),
     getOrderProductsForOrder: build.query({
-      query: (orderId) => `/getOrderProducts?order=${orderId}`,
+      query: (orderId) => `/data/getOrderProducts?order=${orderId}`,
       transformResponse: (response) => response?.data || [],
     }),
     getOrderFinalInfoForOrder: build.query({
-      query: (orderId) => `/getOrderFinalInfo?order=${orderId}`,
+      query: (orderId) => `/data/getOrderFinalInfo?order=${orderId}`,
       transformResponse: (response) => response?.data?.[0],
     }),
     getOrderRobotsInfoForOrder: build.query({
-      query: (orderId) => `/getOrderRobotsInfo?order=${orderId}`,
+      query: (orderId) => `/data/getOrderRobotsInfo?order=${orderId}`,
       transformResponse: (response) => response?.data || [],
+    }),
+    deleteSchedules: build.mutation({
+      query: (ids) => {
+        return {
+          url: `/management/schedules`,
+          body: {
+            ids,
+          },
+          method: 'DELETE',
+        };
+      },
     }),
   }),
 });
@@ -100,10 +115,12 @@ export const {
   useGetF35GeneralSummaryQuery,
   useGetSummaryEfficiencyByRobotQuery,
   useRobotsErrorInfoQuery,
+  useIncomingOrdersByRangeQuery,
   useSearchOrdersInF35Query,
   useGetOrderToPurchaseDataForOrderQuery,
   useGetOrderSchedulesForOrderQuery,
   useGetOrderProductsForOrderQuery,
   useGetOrderFinalInfoForOrderQuery,
   useGetOrderRobotsInfoForOrderQuery,
+  useDeleteSchedulesMutation,
 } = api;

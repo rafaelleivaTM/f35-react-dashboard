@@ -9,6 +9,10 @@ const apiService = {
     const response = await fetch(`${F35_API_URL}/data/getRobotsSummaryEfficiencyByRange?from=${from}&to=${to}`);
     return response.json();
   },
+  // getIncomingOrdersByRange: async (from, to) => {
+  //   const response = await fetch(`${F35_API_URL}/data/getIncomingOrders?from=${from}&to=${to}`);
+  //   return response.json();
+  // },
   getMissingOrdersBetweenBPAndF35: async () => {
     const response = await fetch(`${F35_API_URL}/data/checkMissingOrdersBetweenBPAndF35`);
     return response.json();
@@ -24,6 +28,17 @@ const apiService = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(purchaseGroup),
+    });
+
+    return response.json();
+  },
+  importOrders: async (orders) => {
+    const response = await fetch(`${F35_API_URL}/management/import-orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orders }),
     });
 
     return response.json();

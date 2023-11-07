@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 // sections
 import {
   AppErrorList,
+  AppIncomingOrders,
   AppWidgetSummary,
   DonutChartPanel,
   LineChartsRobotsSummary,
@@ -19,6 +20,7 @@ import { addNotification } from "../redux/notificationsSlice";
 import {
   useGetF35GeneralSummaryQuery,
   useGetSummaryEfficiencyByRobotQuery,
+  useIncomingOrdersByRangeQuery,
   useRobotsErrorInfoQuery
 } from "../redux/api/apiSlice";
 import { getDateFormatted } from "../utils/formatTime";
@@ -34,6 +36,9 @@ export default function DashboardAppPage() {
 
   const [summaryEfficiencyByRange, setSummaryEfficiencyByRange] = useState({});
   const [loadingSummaryEfficiencyByRange, setLoadingSummaryEfficiencyByRange] = useState(false);
+
+  // const [incomingOrdersByRange, setIncomingOrdersByRange] = useState({});
+  // const [loadingIncomingOrdersByRange, setLoadingIncomingOrdersByRange] = useState(false);
 
   const [totalErrorsWidget, setTotalErrorsWidget] = useState(0);
   const [totalManualWidget, setTotalManualWidget] = useState(0);
@@ -82,7 +87,24 @@ export default function DashboardAppPage() {
   } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.MIRA });
   if (miraSummaryStats) console.log(`Response of miraSummaryStats`, miraSummaryStats);
 
-  const { data: robotsErrorInfo, isLoading: loadingRobotsErrors } = useRobotsErrorInfoQuery();
+  const {
+    data: incomingOrdersByRange,
+    isLoading: loadingIncomingOrdersByRange,
+    refetch: refetchIncomingOrdersByRange,
+    isFetching: fetchingIncomingOrdersByRange,
+  } = useIncomingOrdersByRangeQuery(dateRange, {
+    skip: !dateRange,
+  });
+  if (incomingOrdersByRange) console.log(`fetchIncomingOrdersByRange`, incomingOrdersByRange);
+
+  const {
+    data: robotsErrorInfo,
+    isLoading: loadingRobotErrors,
+    refetch: refetchRobotErrors,
+    isFetching: fetchingRobotErrors,
+  } = useRobotsErrorInfoQuery(dateRange, {
+    skip: !dateRange,
+  });
   if (robotsErrorInfo) console.log(`Response of robotsErrorInfo`, robotsErrorInfo);
   if (robotsErrorInfo && robotsErrorInfo.length > 0) {
     const sumeAllErrors = robotsErrorInfo.reduce((acc, error) => acc + parseInt(error.count, 10), 0);
@@ -95,6 +117,9 @@ export default function DashboardAppPage() {
   const [summaryEfficiencyCriteriaChartValue, setSummaryEfficiencyCriteriaChartValue] = useState('Effectiveness');
 
   useEffect(() => {
+    refetchRobotErrors();
+    refetchIncomingOrdersByRange();
+
     const fetchGeneralSummaryByRange = async () => {
       setLoadingGeneralSummaryByRange(true);
       const response = await apiService.getRobotsSummaryByRange(dateRange.startDate, dateRange.endDate);
@@ -113,7 +138,7 @@ export default function DashboardAppPage() {
 
     fetchGeneralSummaryByRange().then();
     fetchSummaryEfficiencyByRange().then();
-  }, [dateRange]);
+  }, [dateRange, refetchRobotErrors, refetchIncomingOrdersByRange]);
 
   useEffect(() => {
     const fetchMissingOrdersBetweenBPAndF35 = async () => {
@@ -218,7 +243,18 @@ export default function DashboardAppPage() {
               {/*  ]} */}
               {/* /> */}
 
-              <AppErrorList title="Errores" list={robotsErrorInfo || []} loading={loadingRobotsErrors} />
+              <AppIncomingOrders
+                title="Incoming Orders"
+                subheader={`From ${dateRange.startDate} to ${dateRange.endDate}`}
+                list={incomingOrdersByRange || { byHours: [], byDays: [] }}
+                loading={loadingIncomingOrdersByRange || fetchingIncomingOrdersByRange}
+              />
+
+              <AppErrorList
+                title="Errores"
+                list={robotsErrorInfo || []}
+                loading={loadingRobotErrors || fetchingRobotErrors}
+              />
 
               {/* <AppTasks */}
               {/*  title="Tasks" */}

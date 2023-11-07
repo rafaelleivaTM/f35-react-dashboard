@@ -15,6 +15,7 @@ import {
 const CronRefreshStats = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const dateRange = useSelector((state) => state.dateRange);
 
   const schedulerTimeValue = useSelector((state) => state.appConfig.cronRefreshStatsInterval);
   const isCronActive = useSelector((state) => state.appConfig.cronRefreshStatsStatus);
@@ -30,7 +31,12 @@ const CronRefreshStats = () => {
   });
   const { refetch: refetchEbaySummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.EBAY });
   const { refetch: refetchMiraSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.MIRA });
-  const { refetch: refetchRobotsErrorInfo } = useRobotsErrorInfoQuery(undefined);
+  const { refetch: refetchRobotsErrorInfo } = useRobotsErrorInfoQuery(dateRange, {
+    skip: !dateRange,
+  });
+  // const { refetch: refetchIncomingOrdersByRange } = useGetIncomingOrdersByRange(dateRange, {
+  //   skip: !dateRange,
+  // });
 
   useEffect(() => {
     let intervalId;
@@ -48,6 +54,7 @@ const CronRefreshStats = () => {
           refetchEbaySummaryStats();
           refetchMiraSummaryStats();
           refetchRobotsErrorInfo();
+          // refetchIncomingOrdersByRange();
         }, interval);
       }
 
@@ -64,6 +71,7 @@ const CronRefreshStats = () => {
     refetchEbaySummaryStats,
     refetchMiraSummaryStats,
     refetchRobotsErrorInfo,
+    // refetchIncomingOrdersByRange,
   ]);
 
   const getScheduleInputValue = (event) => {

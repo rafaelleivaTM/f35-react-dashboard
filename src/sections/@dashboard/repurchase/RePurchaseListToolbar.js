@@ -1,17 +1,7 @@
 import PropTypes from "prop-types";
 // @mui
 import { alpha, styled } from "@mui/material/styles";
-import {
-  Button,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-  Stack,
-  Toolbar,
-  Tooltip,
-  Typography
-} from "@mui/material";
+import { Button, CircularProgress, InputAdornment, OutlinedInput, Stack, Toolbar, Typography } from "@mui/material";
 // component
 import { useRef, useState } from "react";
 import Iconify from "../../../components/iconify";
@@ -50,11 +40,12 @@ const StyledSearch = styled(OutlinedInput, {
 RePurchaseListToolbar.propTypes = {
   numSelected: PropTypes.number,
   onFilterOrdersChange: PropTypes.func,
+  onDeleteSchedules: PropTypes.func,
   loading: PropTypes.bool,
   vendorSelected: PropTypes.string,
 };
 
-export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChange, loading, vendorSelected }) {
+export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChange, loading, onDeleteSchedules }) {
   const inputRef = useRef();
 
   const [searchOrders, setSearchOrders] = useState('');
@@ -73,6 +64,10 @@ export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChang
     onFilterOrdersChange(searchOrders);
   };
 
+  const handleDeleteScheduleAction = () => {
+    onDeleteSchedules();
+  };
+
   return (
     <StyledRoot
       sx={{
@@ -84,7 +79,7 @@ export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChang
     >
       {numSelected > 0 ? (
         <Typography component="div" variant="subtitle1">
-          {numSelected} selected
+          {numSelected && numSelected > 1 ? `${numSelected} selected orders` : `${numSelected} selected order`}
         </Typography>
       ) : (
         <StyledSearch
@@ -101,11 +96,19 @@ export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChang
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <Iconify icon="eva:trash-2-fill" />
-          </IconButton>
-        </Tooltip>
+        <Stack direction={'row'} spacing={3}>
+          <Button
+            variant="contained"
+            color={'error'}
+            startIcon={<Iconify icon="eva:trash-2-fill" />}
+            onClick={handleDeleteScheduleAction}
+          >
+            Delete Schedules
+          </Button>
+          <Button variant="contained" color={'primary'} startIcon={<Iconify icon="eva:refresh-fill" />}>
+            Update Orders
+          </Button>
+        </Stack>
       ) : (
         <Stack direction={'row'} spacing={2}>
           {loading ? <CircularProgress size={30} /> : <></>}
