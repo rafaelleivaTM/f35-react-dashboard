@@ -23,7 +23,7 @@ export default function Router() {
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'orders', element: <OrdersPage /> },
-        { path: 'order-details/:orderId', element: <OrderDetailsPage /> },
+        { path: 'order-details/:orderId?', element: <OrderDetailsPage /> },
         { path: 're-buy', element: <RePurchasePage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'tools', element: <ToolsPage /> },

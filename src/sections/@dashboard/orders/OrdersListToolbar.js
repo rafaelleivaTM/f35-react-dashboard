@@ -2,6 +2,8 @@ import PropTypes from "prop-types";
 // @mui
 import { alpha, styled } from "@mui/material/styles";
 import {
+  Box,
+  Button,
   CircularProgress,
   IconButton,
   InputAdornment,
@@ -12,7 +14,7 @@ import {
   Typography
 } from "@mui/material";
 // component
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Iconify from "../../../components/iconify";
 import { parseSearchInput } from "../../../utils/functionsUtils";
@@ -56,21 +58,31 @@ OrdersListToolbar.propTypes = {
 
 export default function OrdersListToolbar({ numSelected, onFilterName }) {
   const inputRef = useRef();
+  const buttonSearchRef = useRef();
   const dispatch = useDispatch();
 
   const searchOrders = useSelector((state) => state.searchOrders.searched);
+  const [ordersInput, setOrdersInput] = useState(searchOrders ? searchOrders.join(', ') : '');
   const filter = useSelector((state) => state.searchOrders.filter);
-  const { isFetching: loading } = useSearchOrdersInF35Query({ orders: searchOrders, filter });
+  const { isFetching: loading } = useSearchOrdersInF35Query({ orders: ordersInput === '' ? [] : searchOrders, filter });
 
   const onChangeInputSearchValue = (event) => {
     if (event.target.value === '') {
       dispatch(searchOrdersUpdated([]));
-      inputRef.current.querySelector('input').blur();
+      setOrdersInput('');
     } else {
-      const orders = parseSearchInput(event.target.value);
+      setOrdersInput(event.target.value);
+    }
+  };
+
+  const handleSearch = () => {
+    if (ordersInput && ordersInput.length > 0) {
+      const orders = parseSearchInput(ordersInput);
       dispatch(searchOrdersUpdated(orders));
-      onFilterName(orders, filter);
-      inputRef.current.focus();
+      onFilterName(ordersInput, filter);
+    } else {
+      setOrdersInput('');
+      dispatch(searchOrdersUpdated([]));
     }
   };
 
@@ -88,18 +100,34 @@ export default function OrdersListToolbar({ numSelected, onFilterName }) {
           {numSelected} selected
         </Typography>
       ) : (
-        <StyledSearch
-          value={searchOrders.join(',')}
-          ref={inputRef}
-          onChange={onChangeInputSearchValue}
-          placeholder="Search orders..."
-          hasValue={searchOrders.length > 0}
-          startAdornment={
-            <InputAdornment position="start">
-              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-            </InputAdornment>
-          }
-        />
+        <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} sx={{ mr: 2, width: '100%' }}>
+          <StyledSearch
+            value={ordersInput}
+            ref={inputRef}
+            onChange={onChangeInputSearchValue}
+            placeholder="Search orders..."
+            hasValue={searchOrders.length > 0}
+            startAdornment={
+              <InputAdornment position="start">
+                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+              </InputAdornment>
+            }
+          />
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            <Box sx={{ width: '30px' }}>{loading ? <CircularProgress size={30} /> : <></>}</Box>
+            <Button
+              variant="contained"
+              color={'error'}
+              ref={buttonSearchRef}
+              disabled={ordersInput.length === 0}
+              onClick={handleSearch}
+              sx={{ minWidth: '115px' }}
+              startIcon={<Iconify icon="eva:search-fill" />}
+            >
+              Search
+            </Button>
+          </Stack>
+        </Stack>
       )}
 
       {numSelected > 0 ? (
@@ -109,14 +137,11 @@ export default function OrdersListToolbar({ numSelected, onFilterName }) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Stack direction={'row'} spacing={2} alignSelf={'center'}>
-          {loading ? <CircularProgress size={30} /> : <></>}
-          <Tooltip title="Filter list">
-            <IconButton>
-              <Iconify icon="ic:round-filter-list" />
-            </IconButton>
-          </Tooltip>
-        </Stack>
+        <Tooltip title="Filter list">
+          <IconButton>
+            <Iconify icon="ic:round-filter-list" />
+          </IconButton>
+        </Tooltip>
       )}
     </StyledRoot>
   );

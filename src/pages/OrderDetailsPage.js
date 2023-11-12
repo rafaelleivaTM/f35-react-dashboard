@@ -59,7 +59,7 @@ const OrderDetailsPage = () => {
   const { orderId } = useParams();
   console.log('orderId in params', orderId);
 
-  const [orderInputSearch, setOrderInputSearch] = useState('');
+  const [orderInputSearch, setOrderInputSearch] = useState(orderId || '');
 
   const {
     data: orderSummaryData,
@@ -75,6 +75,7 @@ const OrderDetailsPage = () => {
   } = useGetOrderSchedulesForOrderQuery(orderId, {
     skip: !orderId,
   });
+  console.log('isLoadingOrderSchedulesData', isLoadingOrderSchedulesData);
   const {
     data: orderProductsData,
     isLoading: isLoadingOrderProductsData,
@@ -89,6 +90,7 @@ const OrderDetailsPage = () => {
   } = useGetOrderFinalInfoForOrderQuery(orderId, {
     skip: !orderId,
   });
+  console.log('isLoadingOrderFinalInfoData', isLoadingOrderFinalInfoData);
   const {
     data: orderRobotsInfoData,
     isLoading: isLoadingOrderRobotsInfoData,
@@ -143,6 +145,7 @@ const OrderDetailsPage = () => {
                 <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
               </InputAdornment>
             }
+            value={orderInputSearch}
           />
 
           <Button
