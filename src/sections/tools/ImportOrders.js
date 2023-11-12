@@ -139,12 +139,13 @@ const ImportOrdersForm = () => {
   }, {});
 
   const getImportFinishMessage = () => {
-    const existErrors = ordersImportResults.some((item) => item.error);
-    if (existErrors) {
+    if (hasErrorInImports) {
       return 'Import finish with errors';
     }
     return 'Import finish';
   };
+
+  const hasErrorInImports = ordersImportResults.some((item) => item.error);
 
   return (
     <Card>
@@ -184,7 +185,7 @@ const ImportOrdersForm = () => {
           </Stack>
         </form>
         <Stack direction={'row'} justifyContent={'space-between'} sx={{ my: 3 }}>
-          <Typography variant={'caption'}>
+          <Typography variant={'caption'} sx={{ color: hasErrorInImports ? 'rgb(248,29,56)' : 'inherit' }}>
             {loading ? 'Importing' : ordersImportResults.length === 0 ? 'Start process' : getImportFinishMessage()}
           </Typography>
         </Stack>
