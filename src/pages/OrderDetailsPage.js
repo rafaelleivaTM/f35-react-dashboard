@@ -53,6 +53,42 @@ const TagInfo = styled(Paper)(({ theme }) => ({
   lineHeight: '60px',
 }));
 
+const InfoCard = ({ title, isLoadingData, data, renderValue }) => (
+  <Card sx={{ mb: 2 }}>
+    <CardHeader title={title} />
+    <CardContent>
+      {isLoadingData ? (
+        <Box display={'flex'}>
+          <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
+        </Box>
+      ) : (
+        data &&
+        data.length > 0 &&
+        data.map((item, indexS) => (
+          <div key={indexS}>
+            <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
+              {item &&
+                Object.keys(item).map((prop, index) => (
+                  <Grid item xs={12} sm={'auto'} key={index} sx={{ '&': { maxWidth: '100% !important' } }}>
+                    <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
+                      <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
+                        <Typography variant={'body2'}>{prop}</Typography>
+                        <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
+                          {renderValue(prop, item[prop])}
+                        </Typography>
+                      </Stack>
+                    </TagInfo>
+                  </Grid>
+                ))}
+            </Grid>
+            {indexS < data.length - 1 && <Divider sx={{ my: 3 }} />}
+          </div>
+        ))
+      )}
+    </CardContent>
+  </Card>
+);
+
 const OrderDetailsPage = () => {
   const navigate = useNavigate();
   const f35Statuses = useSelector((state) => state.appConfig.f35Statuses);
@@ -75,7 +111,6 @@ const OrderDetailsPage = () => {
   } = useGetOrderSchedulesForOrderQuery(orderId, {
     skip: !orderId,
   });
-  console.log('isLoadingOrderSchedulesData', isLoadingOrderSchedulesData);
   const {
     data: orderProductsData,
     isLoading: isLoadingOrderProductsData,
@@ -90,7 +125,6 @@ const OrderDetailsPage = () => {
   } = useGetOrderFinalInfoForOrderQuery(orderId, {
     skip: !orderId,
   });
-  console.log('isLoadingOrderFinalInfoData', isLoadingOrderFinalInfoData);
   const {
     data: orderRobotsInfoData,
     isLoading: isLoadingOrderRobotsInfoData,
@@ -159,129 +193,33 @@ const OrderDetailsPage = () => {
           </Button>
         </Stack>
 
-        <Card sx={{ mb: 2 }}>
-          <CardHeader title={'General information'} />
+        <InfoCard
+          title="General information"
+          isLoadingData={isLoadingOrderSummaryData}
+          data={[orderSummaryData]}
+          renderValue={renderValue}
+        />
 
-          <CardContent>
-            {isLoadingOrderSummaryData ? (
-              <Box display={'flex'}>
-                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
-              </Box>
-            ) : (
-              <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
-                {orderSummaryData &&
-                  Object.keys(orderSummaryData).map((prop, index) => (
-                    <Grid item xs={12} sm={'auto'} key={index} sx={{ '&': { maxWidth: '100% !important' } }}>
-                      <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
-                        <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
-                          <Typography variant={'body2'}>{prop}</Typography>
-                          <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
-                            {renderValue(prop, orderSummaryData[prop])}
-                          </Typography>
-                        </Stack>
-                      </TagInfo>
-                    </Grid>
-                  ))}
-              </Grid>
-            )}
-          </CardContent>
-        </Card>
+        <InfoCard
+          title="Schedules"
+          isLoadingData={isLoadingOrderSchedulesData}
+          data={orderSchedulesData}
+          renderValue={renderValue}
+        />
 
-        <Card sx={{ mb: 2 }}>
-          <CardHeader title={'Schedules'} />
+        <InfoCard
+          title="Products"
+          isLoadingData={isLoadingOrderProductsData}
+          data={orderProductsData}
+          renderValue={renderValue}
+        />
 
-          <CardContent>
-            {isLoadingOrderSchedulesData ? (
-              <Box display={'flex'}>
-                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
-              </Box>
-            ) : (
-              orderSchedulesData &&
-              orderSchedulesData.length > 0 &&
-              orderSchedulesData.map((schedule, indexS) => (
-                <div key={indexS}>
-                  <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
-                    {Object.keys(schedule).map((prop, index) => (
-                      <Grid item xs={12} sm={'auto'} key={index} sx={{ '&': { maxWidth: '100% !important' } }}>
-                        <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
-                          <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
-                            <Typography variant={'body2'}>{prop}</Typography>
-                            <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
-                              {renderValue(prop, schedule[prop])}
-                            </Typography>
-                          </Stack>
-                        </TagInfo>
-                      </Grid>
-                    ))}
-                  </Grid>
-                  {indexS < orderSchedulesData.length - 1 && <Divider sx={{ my: 3 }} />}
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        <Card sx={{ mb: 2 }}>
-          <CardHeader title={'Products'} />
-
-          <CardContent>
-            {isLoadingOrderProductsData ? (
-              <Box display={'flex'}>
-                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
-              </Box>
-            ) : (
-              orderProductsData &&
-              orderProductsData.length > 0 &&
-              orderProductsData.map((product, index) => (
-                <div key={index}>
-                  <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
-                    {Object.keys(product).map((prop, indexP) => (
-                      <Grid item xs={12} sm={'auto'} key={indexP} sx={{ '&': { maxWidth: '100% !important' } }}>
-                        <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
-                          <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
-                            <Typography variant={'body2'}>{prop}</Typography>
-                            <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
-                              {renderValue(prop, product[prop])}
-                            </Typography>
-                          </Stack>
-                        </TagInfo>
-                      </Grid>
-                    ))}
-                  </Grid>
-                  {index < orderProductsData.length - 1 && <Divider sx={{ my: 3 }} />}
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        <Card sx={{ mb: 2 }}>
-          <CardHeader title={'Final info'} />
-
-          <CardContent>
-            {isLoadingOrderFinalInfoData ? (
-              <Box display={'flex'}>
-                <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
-              </Box>
-            ) : (
-              <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
-                {orderFinalInfoData &&
-                  Object.keys(orderFinalInfoData).map((prop, index) => (
-                    <Grid item xs={12} sm={'auto'} key={index} sx={{ '&': { maxWidth: '100% !important' } }}>
-                      <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
-                        <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
-                          <Typography variant={'body2'}>{prop}</Typography>
-                          <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
-                            {renderValue(prop, orderFinalInfoData[prop])}
-                          </Typography>
-                        </Stack>
-                      </TagInfo>
-                    </Grid>
-                  ))}
-              </Grid>
-            )}
-          </CardContent>
-        </Card>
+        <InfoCard
+          title="Final info"
+          isLoadingData={isLoadingOrderFinalInfoData}
+          data={[orderFinalInfoData]}
+          renderValue={renderValue}
+        />
 
         <Card sx={{ mb: 2 }}>
           <CardHeader title={'Robot info'} />
