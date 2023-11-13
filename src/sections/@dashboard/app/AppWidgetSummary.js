@@ -5,7 +5,6 @@ import { Card, Typography } from "@mui/material";
 // utils
 import CountUp from "react-countup";
 import { useEffect, useRef } from "react";
-import { fShortenNumber } from "../../../utils/formatNumber";
 // components
 import Iconify from "../../../components/iconify";
 
@@ -65,7 +64,7 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
       </StyledIcon>
 
       <Typography variant="h5">
-        <CountUp start={startRef.current} end={fShortenNumber(total)} />
+        <CountUp start={startRef.current} end={total} />
       </Typography>
 
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>

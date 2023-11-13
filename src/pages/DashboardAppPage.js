@@ -42,7 +42,8 @@ export default function DashboardAppPage() {
 
   const [totalErrorsWidget, setTotalErrorsWidget] = useState(0);
   const [totalManualWidget, setTotalManualWidget] = useState(0);
-  const [totalSuccessfullWidget, setTotalSuccessfullWidget] = useState(0);
+  const [totalSuccessfullyWidget, setTotalSuccessfullyWidget] = useState(0);
+  const [totalSuccessfullyMiraOrders, setTotalSuccessfullyMiraOrders] = useState(0);
 
   const date = getDateFormatted();
   const {
@@ -54,8 +55,8 @@ export default function DashboardAppPage() {
     if (f35SummaryStats?.Manual && +f35SummaryStats.Manual !== totalManualWidget) {
       setTotalManualWidget(+f35SummaryStats.Manual);
     }
-    if (f35SummaryStats?.Success && +f35SummaryStats.Success !== totalSuccessfullWidget) {
-      setTotalSuccessfullWidget(+f35SummaryStats.Success);
+    if (f35SummaryStats?.Success && +f35SummaryStats.Success !== totalSuccessfullyWidget) {
+      setTotalSuccessfullyWidget(+f35SummaryStats.Success);
     }
   }
 
@@ -81,11 +82,16 @@ export default function DashboardAppPage() {
   if (ebaySummaryStats) console.log(`Response of ebaySummaryStats`, ebaySummaryStats);
 
   const {
-    data: miraSummaryStats,
+    data: miraSummaryStats = [],
     isLoading: loadingMiraSummaryStats,
     isFetching: fetchingMiraSummaryStats,
   } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.MIRA });
   if (miraSummaryStats) console.log(`Response of miraSummaryStats`, miraSummaryStats);
+  if (miraSummaryStats && miraSummaryStats.length > 0) {
+    if (miraSummaryStats[0]?.Success && +miraSummaryStats[0]?.Success !== totalSuccessfullyMiraOrders) {
+      setTotalSuccessfullyMiraOrders(+miraSummaryStats[0]?.Success);
+    }
+  }
 
   const {
     data: incomingOrdersByRange,
@@ -173,13 +179,17 @@ export default function DashboardAppPage() {
       <Container maxWidth="xl">
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:dollar-circle-filled'} />
+            <AppWidgetSummary
+              title="Mirak Success"
+              total={totalSuccessfullyMiraOrders}
+              icon={'ant-design:medium-circle-filled'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
               title="Successfull Orders"
-              total={totalSuccessfullWidget}
+              total={totalSuccessfullyWidget}
               color="success"
               icon={'ant-design:check-circle-filled'}
             />
@@ -349,16 +359,16 @@ export default function DashboardAppPage() {
 
               <PieChartRobotStat
                 title="Mira today"
-                total={parseInt(miraSummaryStats?.Total, 10) || 0}
-                effectiveness={parseInt(miraSummaryStats?.Effectiveness, 10) || 0}
+                total={parseInt(miraSummaryStats[0]?.Total, 10) || 0}
+                effectiveness={parseInt(miraSummaryStats[0]?.Effectiveness, 10) || 0}
                 chartData={[
-                  { label: 'In Progress', value: parseInt(miraSummaryStats?.InProgress, 10) || 0 },
-                  { label: 'Pending', value: parseInt(miraSummaryStats?.Pending, 10) || 0 },
-                  { label: 'Failed', value: parseInt(miraSummaryStats?.Failed, 10) || 0 },
-                  { label: 'Cancelled', value: parseInt(miraSummaryStats?.Cancelled, 10) || 0 },
-                  { label: 'Warning', value: parseInt(miraSummaryStats?.Warning, 10) || 0 },
-                  { label: 'Success', value: parseInt(miraSummaryStats?.Success, 10) || 0 },
-                  { label: 'DevBlocked', value: parseInt(miraSummaryStats?.DevBlocked, 10) || 0 },
+                  { label: 'In Progress', value: parseInt(miraSummaryStats[0]?.InProgress, 10) || 0 },
+                  { label: 'Pending', value: parseInt(miraSummaryStats[0]?.Pending, 10) || 0 },
+                  { label: 'Failed', value: parseInt(miraSummaryStats[0]?.Failed, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(miraSummaryStats[0]?.Cancelled, 10) || 0 },
+                  { label: 'Warning', value: parseInt(miraSummaryStats[0]?.Warning, 10) || 0 },
+                  { label: 'Success', value: parseInt(miraSummaryStats[0]?.Success, 10) || 0 },
+                  { label: 'DevBlocked', value: parseInt(miraSummaryStats[0]?.DevBlocked, 10) || 0 },
                 ]}
                 chartColors={STATUS_COLORS}
                 loading={loadingMiraSummaryStats}
