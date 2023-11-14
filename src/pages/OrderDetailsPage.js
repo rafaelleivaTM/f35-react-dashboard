@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import { alpha, styled } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Iconify from '../components/iconify';
 import {
   useGetOrderFinalInfoForOrderQuery,
@@ -97,9 +97,13 @@ const OrderDetailsPage = () => {
 
   const [orderInputSearch, setOrderInputSearch] = useState(orderId || '');
 
+  const [refreshCount, setRefreshCount] = useState(0);
+
   const {
     data: orderSummaryData,
     isLoading: isLoadingOrderSummaryData,
+    refetch: refetchOrderSummaryData,
+    isFetching: isFetchingOrderSummaryData,
     isError: isErrorOrderSummaryData,
   } = useGetOrderToPurchaseDataForOrderQuery(orderId, {
     skip: !orderId,
@@ -107,6 +111,8 @@ const OrderDetailsPage = () => {
   const {
     data: orderSchedulesData,
     isLoading: isLoadingOrderSchedulesData,
+    refetch: refetchOrderSchedulesData,
+    isFetching: isFetchingOrderSchedulesData,
     isError: isErrorOrderSchedulesData,
   } = useGetOrderSchedulesForOrderQuery(orderId, {
     skip: !orderId,
@@ -114,6 +120,8 @@ const OrderDetailsPage = () => {
   const {
     data: orderProductsData,
     isLoading: isLoadingOrderProductsData,
+    refetch: refetchOrderProductsData,
+    isFetching: isFetchingOrderProductsData,
     isError: isErrorOrderProductsData,
   } = useGetOrderProductsForOrderQuery(orderId, {
     skip: !orderId,
@@ -121,6 +129,8 @@ const OrderDetailsPage = () => {
   const {
     data: orderFinalInfoData,
     isLoading: isLoadingOrderFinalInfoData,
+    refetch: refetchOrderFinalInfoData,
+    isFetching: isFetchingOrderFinalInfoData,
     isError: isErrorOrderFinalInfoData,
   } = useGetOrderFinalInfoForOrderQuery(orderId, {
     skip: !orderId,
@@ -128,10 +138,22 @@ const OrderDetailsPage = () => {
   const {
     data: orderRobotsInfoData,
     isLoading: isLoadingOrderRobotsInfoData,
+    refetch: refetchOrderRobotsInfoData,
+    isFetching: isFetchingOrderRobotsInfoData,
     isError: isErrorOrderRobotsInfoData,
   } = useGetOrderRobotsInfoForOrderQuery(orderId, {
     skip: !orderId,
   });
+
+  useEffect(() => {
+    if (refetchOrderSummaryData) {
+      refetchOrderSummaryData();
+      refetchOrderSchedulesData();
+      refetchOrderProductsData();
+      refetchOrderFinalInfoData();
+      refetchOrderRobotsInfoData();
+    }
+  }, [refreshCount]);
 
   const onChangeInputSearchValue = (event) => {
     setOrderInputSearch(event.target.value);
@@ -139,8 +161,8 @@ const OrderDetailsPage = () => {
 
   const handleSearch = () => {
     console.log('Searching info of order', orderId);
-    // set orderId in params
     navigate(`/dashboard/order-details/${orderInputSearch}`);
+    setRefreshCount(refreshCount + 1);
   };
 
   const renderValue = (property, value) => {
@@ -195,28 +217,28 @@ const OrderDetailsPage = () => {
 
         <InfoCard
           title="General information"
-          isLoadingData={isLoadingOrderSummaryData}
+          isLoadingData={isLoadingOrderSummaryData || isFetchingOrderSummaryData}
           data={[orderSummaryData]}
           renderValue={renderValue}
         />
 
         <InfoCard
           title="Schedules"
-          isLoadingData={isLoadingOrderSchedulesData}
+          isLoadingData={isLoadingOrderSchedulesData || isFetchingOrderSchedulesData}
           data={orderSchedulesData}
           renderValue={renderValue}
         />
 
         <InfoCard
           title="Products"
-          isLoadingData={isLoadingOrderProductsData}
+          isLoadingData={isLoadingOrderProductsData || isFetchingOrderProductsData}
           data={orderProductsData}
           renderValue={renderValue}
         />
 
         <InfoCard
           title="Final info"
-          isLoadingData={isLoadingOrderFinalInfoData}
+          isLoadingData={isLoadingOrderFinalInfoData || isFetchingOrderFinalInfoData}
           data={[orderFinalInfoData]}
           renderValue={renderValue}
         />
@@ -225,7 +247,7 @@ const OrderDetailsPage = () => {
           <CardHeader title={'Robot info'} />
 
           <CardContent>
-            {isLoadingOrderRobotsInfoData ? (
+            {isLoadingOrderRobotsInfoData || isFetchingOrderRobotsInfoData ? (
               <Box display={'flex'}>
                 <Skeleton variant="rectangular" width={'100%'} height={'70px'} />
               </Box>
@@ -245,7 +267,13 @@ const OrderDetailsPage = () => {
                             <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
                               <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
                                 <Typography variant={'body2'}>{prop}</Typography>
-                                <Typography variant={'subtitle2'} sx={{ fontSize: '100%', wordWrap: 'break-word' }}>
+                                <Typography
+                                  variant={'subtitle2'}
+                                  sx={{
+                                    fontSize: '100%',
+                                    wordWrap: 'break-word',
+                                  }}
+                                >
                                   {renderValue(prop, robotData[prop])}
                                 </Typography>
                               </Stack>

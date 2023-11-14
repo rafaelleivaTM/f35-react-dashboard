@@ -349,6 +349,14 @@ export default function RePurchasePage() {
     setSelectedOrders(orders);
   };
 
+  const handleSelectAllSchedules = (robotId) => {
+    console.log('Select all', robotId);
+  };
+
+  const handleUnSelectAllSchedules = (robotId) => {
+    console.log('Unselect all', robotId);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -423,6 +431,8 @@ export default function RePurchasePage() {
                   onSelectAllClick={handleSelectAllClick}
                   tableLoading={searchingOrdersLoading || isDeletingSchedules || isUpdatingOrdersToRepurchase}
                   searchAction={searchOrdersTrigger}
+                  onSelectALlSchedules={handleSelectAllSchedules}
+                  onUnSelectAllSchedules={handleUnSelectAllSchedules}
                 />
                 <TableBody>
                   {filteredSchedules.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {

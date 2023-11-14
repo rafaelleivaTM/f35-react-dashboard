@@ -133,6 +133,4 @@ export const {
   useGetOrderProductsForOrderQuery,
   useGetOrderFinalInfoForOrderQuery,
   useGetOrderRobotsInfoForOrderQuery,
-  useDeleteSchedulesMutation,
-  useUpdateOrdersToRepurchaseMutation,
 } = api;
