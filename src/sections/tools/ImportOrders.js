@@ -193,7 +193,7 @@ const ImportOrdersForm = () => {
             </Typography>
             <FormControlLabel
               control={<Checkbox size={'small'} onChange={(event) => setSyncOrders(event.target.checked)} />}
-              label="Sync orders"
+              label="Sync tables"
             />
           </Stack>
         </form>
