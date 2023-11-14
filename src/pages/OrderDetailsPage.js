@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import { alpha, styled } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Iconify from '../components/iconify';
 import {
   useGetOrderFinalInfoForOrderQuery,
@@ -97,8 +97,6 @@ const OrderDetailsPage = () => {
 
   const [orderInputSearch, setOrderInputSearch] = useState(orderId || '');
 
-  const [refreshCount, setRefreshCount] = useState(0);
-
   const {
     data: orderSummaryData,
     isLoading: isLoadingOrderSummaryData,
@@ -141,19 +139,10 @@ const OrderDetailsPage = () => {
     refetch: refetchOrderRobotsInfoData,
     isFetching: isFetchingOrderRobotsInfoData,
     isError: isErrorOrderRobotsInfoData,
+    isI,
   } = useGetOrderRobotsInfoForOrderQuery(orderId, {
     skip: !orderId,
   });
-
-  useEffect(() => {
-    if (refetchOrderSummaryData) {
-      refetchOrderSummaryData();
-      refetchOrderSchedulesData();
-      refetchOrderProductsData();
-      refetchOrderFinalInfoData();
-      refetchOrderRobotsInfoData();
-    }
-  }, [refreshCount]);
 
   const onChangeInputSearchValue = (event) => {
     setOrderInputSearch(event.target.value);
@@ -162,7 +151,11 @@ const OrderDetailsPage = () => {
   const handleSearch = () => {
     console.log('Searching info of order', orderId);
     navigate(`/dashboard/order-details/${orderInputSearch}`);
-    setRefreshCount(refreshCount + 1);
+    refetchOrderSummaryData();
+    refetchOrderSchedulesData();
+    refetchOrderProductsData();
+    refetchOrderFinalInfoData();
+    refetchOrderRobotsInfoData();
   };
 
   const renderValue = (property, value) => {
