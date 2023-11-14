@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 // @mui
 import { alpha, styled } from "@mui/material/styles";
-import { Button, CircularProgress, InputAdornment, OutlinedInput, Stack, Toolbar, Typography } from "@mui/material";
+import { Button, InputAdornment, OutlinedInput, Stack, Toolbar, Typography } from "@mui/material";
 // component
 import { useRef, useState } from "react";
 import Iconify from "../../../components/iconify";
@@ -41,14 +41,30 @@ RePurchaseListToolbar.propTypes = {
   numSelected: PropTypes.number,
   onFilterOrdersChange: PropTypes.func,
   onDeleteSchedules: PropTypes.func,
+  onUpdateOrders: PropTypes.func,
   loading: PropTypes.bool,
+  deletingSchedules: PropTypes.bool,
+  updatingOrders: PropTypes.bool,
+  removeSchedulesDone: PropTypes.bool,
+  updateOrdersDone: PropTypes.bool,
   vendorSelected: PropTypes.string,
+  searchOrders: PropTypes.array,
+  selectedOrders: PropTypes.array,
+  setSearchOrders: PropTypes.func,
 };
 
-export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChange, loading, onDeleteSchedules }) {
+export default function RePurchaseListToolbar({
+  numSelected,
+  onFilterOrdersChange,
+  onDeleteSchedules,
+  onUpdateOrders,
+  searchOrders,
+  selectedOrders,
+  setSearchOrders,
+}) {
   const inputRef = useRef();
 
-  const [searchOrders, setSearchOrders] = useState('');
+  const [inputSearchValue, setInputSearchValue] = useState('');
 
   const onChangeInputSearchValue = (event) => {
     if (event.target.value === '') {
@@ -58,6 +74,7 @@ export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChang
       setSearchOrders(orders);
       inputRef.current.focus();
     }
+    setInputSearchValue(event.target.value);
   };
 
   const handleSearch = () => {
@@ -66,6 +83,10 @@ export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChang
 
   const handleDeleteScheduleAction = () => {
     onDeleteSchedules();
+  };
+
+  const handleUpdateOrdersAction = () => {
+    onUpdateOrders();
   };
 
   return (
@@ -84,6 +105,7 @@ export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChang
       ) : (
         <StyledSearch
           ref={inputRef}
+          value={inputSearchValue}
           onChange={onChangeInputSearchValue}
           placeholder="Search orders..."
           hasValue={searchOrders.length > 0}
@@ -102,16 +124,22 @@ export default function RePurchaseListToolbar({ numSelected, onFilterOrdersChang
             color={'error'}
             startIcon={<Iconify icon="eva:trash-2-fill" />}
             onClick={handleDeleteScheduleAction}
+            disabled={selectedOrders.length === 0}
           >
             Delete Schedules
           </Button>
-          <Button variant="contained" color={'primary'} startIcon={<Iconify icon="eva:refresh-fill" />}>
+          <Button
+            variant="contained"
+            color={'primary'}
+            startIcon={<Iconify icon="eva:refresh-fill" />}
+            onClick={handleUpdateOrdersAction}
+            disabled={selectedOrders.length === 0}
+          >
             Update Orders
           </Button>
         </Stack>
       ) : (
         <Stack direction={'row'} spacing={2}>
-          {loading ? <CircularProgress size={30} /> : <></>}
           <Button
             variant="contained"
             color={'error'}

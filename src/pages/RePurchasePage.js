@@ -5,9 +5,14 @@ import { useEffect, useState } from "react";
 // @mui
 import {
   Box,
+  Button,
   Card,
   Checkbox,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   MenuItem,
   Paper,
@@ -34,7 +39,7 @@ import apiService from "../services/apiService";
 import { BRAND_COLORS, F35_ROBOTS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_DATA } from "../utils/constants";
 import { getAbbreviation } from "../utils/functionsUtils";
 import LetterAvatar from "../components/letter-avatar";
-import { useDeleteSchedulesMutation } from "../redux/api/apiSlice";
+import { api } from "../redux/api/apiSlice";
 
 // ----------------------------------------------------------------------
 
@@ -86,39 +91,55 @@ export default function RePurchasePage() {
 
   const [order, setOrder] = useState('asc');
 
-  const [selected, setSelected] = useState([]);
+  const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const [selectedOrders, setSelectedOrders] = useState([]);
 
   const [orderBy, setOrderBy] = useState('name');
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [rePurchaseWithVendor, setRePurchaseWithVendor] = useState('');
 
+  const [searchOrders, setSearchOrders] = useState('');
+
   const [schedulesData, setSchedulesData] = useState([]);
 
-  const [searchingOrders, setSearchingOrders] = useState(false);
+  const [confirmModalScheduleRemovalOpen, setConfirmModalScheduleRemovalOpen] = useState(false);
+  const [confirmModalUpdateOrdersOpen, setConfirmModalUpdateOrdersOpen] = useState(false);
 
-  const [repurchasingOrders, setRepurchasingOrders] = useState(false);
+  const [searchingOrdersLoading, setSearchingOrdersLoading] = useState(false);
 
   const f35SchedulesMetadata = useSelector((state) => state.appConfig.f35SchedulesMetadata);
 
-  const [deleteSchedules, { isLoading: isDeletingSchedules }] = useDeleteSchedulesMutation();
+  const [deleteSchedules, { isLoading: isDeletingSchedules }] = api.endpoints.deleteSchedules.useMutation();
+
+  const [updateOrdersToRePurchase, { isLoading: isUpdatingOrdersToRepurchase }] =
+    api.endpoints.updateOrdersToRePurchase.useMutation();
 
   useEffect(() => {
+    const selectSchedulesToRePurchase = (robotIds) => {
+      const schedules = [...schedulesData];
+      const robotSchedules = schedules.filter((sched) => robotIds.indexOf(sched.robot) > -1).map((sched) => sched.id);
+      let orders = schedules.filter((sched) => robotIds.indexOf(sched.robot) > -1).map((sched) => sched.orderId);
+      orders = [...new Set(orders)];
+      setSelectedSchedules(robotSchedules);
+      setSelectedOrders(orders);
+    };
+
     if (rePurchaseWithVendor && schedulesData && schedulesData.length > 0) {
       switch (rePurchaseWithVendor) {
         case 'amz': {
-          selectSchedulesToRePurchase(F35_ROBOTS.ZINC_AMZ_ID);
+          selectSchedulesToRePurchase([F35_ROBOTS.ZINC_AMZ_ID, 20]);
           break;
         }
         case 'ebay': {
-          selectSchedulesToRePurchase(F35_ROBOTS.EBAY_ID);
+          selectSchedulesToRePurchase([F35_ROBOTS.EBAY_ID]);
           break;
         }
         case 'wrt': {
-          selectSchedulesToRePurchase(F35_ROBOTS.ZINC_WRT_ID);
+          selectSchedulesToRePurchase([F35_ROBOTS.ZINC_WRT_ID]);
           break;
         }
         case 'mira': {
@@ -132,10 +153,20 @@ export default function RePurchasePage() {
     }
   }, [rePurchaseWithVendor, schedulesData]);
 
-  const deleteSchedulesAction = () => {
-    deleteSchedules(selected)
+  const handleDeleteSchedulesAction = () => {
+    setConfirmModalScheduleRemovalOpen(true);
+  };
+
+  const deleteScheduleAction = () => {
+    handleCloseConfirmScheduleRemovalModal();
+    deleteSchedules(selectedSchedules)
       .then((response) => {
-        console.log('Response from deleteSchedulesAction', response);
+        if (response?.data && response.data.statusCode === 200) {
+          searchOrdersTrigger();
+          console.log('Response success from deleteSchedulesAction', response);
+        } else {
+          console.error('Response fail from deleteSchedulesAction', response);
+        }
       })
       .catch((error) => {
         console.log('error from deleteSchedulesAction', error);
@@ -145,26 +176,49 @@ export default function RePurchasePage() {
   const deleteSingleSchedule = (id) => {
     deleteSchedules([id])
       .then((response) => {
-        console.log('Response from deleteSingleSchedule', response);
+        if (response?.data && response.data.statusCode === 200) {
+          searchOrdersTrigger();
+          console.log('Response success from deleteSingleSchedule', response);
+        } else {
+          console.error('Response fail from deleteSingleSchedule', response);
+        }
       })
       .catch((error) => {
         console.log('error from deleteSingleSchedule', error);
       });
   };
 
-  const selectSchedulesToRePurchase = (robotId) => {
-    const schedules = [...schedulesData];
-    const robotSchedules = schedules.filter((sched) => sched.robot === robotId).map((sched) => sched.id);
-    setSelected(robotSchedules);
+  const handleConfirmUpdateOrdersToRepurchaseAction = () => {
+    handleOpenConfirmUpdateOrdersModal();
   };
 
-  const searchOrders = (orders) => {
+  const updateOrdersToRePurchaseAction = () => {
+    handleCloseConfirmUpdateOrdersModal();
+    updateOrdersToRePurchase(selectedOrders)
+      .then((response) => {
+        if (response?.data && response.data.statusCode === 200) {
+          console.log('Response success from updateOrdersToRePurchase', response);
+          searchOrdersTrigger();
+        } else {
+          console.log('Response fail from updateOrdersToRePurchase', response);
+        }
+      })
+      .catch((error) => {
+        console.log('error from updateOrdersToRePurchase', error);
+      });
+  };
+
+  const searchOrdersTrigger = () => {
+    searchOrdersAction(searchOrders);
+  };
+
+  const searchOrdersAction = (orders) => {
     if (!orders) {
       console.log('No orders selected');
       return;
     }
 
-    setSearchingOrders(true);
+    setSearchingOrdersLoading(true);
     apiService
       .getOrdersListSchedules(orders)
       .then((response) => {
@@ -177,7 +231,7 @@ export default function RePurchasePage() {
         console.log('error from getOrdersListSchedules', error);
       })
       .finally(() => {
-        setSearchingOrders(false);
+        setSearchingOrdersLoading(false);
       });
   };
 
@@ -263,26 +317,36 @@ export default function RePurchasePage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = schedulesData.map((n) => n.id);
-      setSelected(newSelecteds);
+      const newSelects = schedulesData.map((n) => n.id);
+      setSelectedSchedules(newSelects);
+      let orders = schedulesData.map((n) => n.orderId);
+      orders = [...new Set(orders)];
+      setSelectedOrders(orders);
       return;
     }
-    setSelected([]);
+    setSelectedSchedules([]);
+    setSearchOrders([]);
   };
 
   const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+    const selectedIndex = selectedSchedules.indexOf(name);
     let newSelected = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selectedSchedules, name);
     } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
+      newSelected = newSelected.concat(selectedSchedules.slice(1));
+    } else if (selectedIndex === selectedSchedules.length - 1) {
+      newSelected = newSelected.concat(selectedSchedules.slice(0, -1));
     } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
+      newSelected = newSelected.concat(
+        selectedSchedules.slice(0, selectedIndex),
+        selectedSchedules.slice(selectedIndex + 1)
+      );
     }
-    setSelected(newSelected);
+    setSelectedSchedules(newSelected);
+    let orders = schedulesData.filter((s) => newSelected.indexOf(s.id) > -1).map((s) => s.orderId);
+    orders = [...new Set(orders)];
+    setSelectedOrders(orders);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -296,7 +360,19 @@ export default function RePurchasePage() {
 
   const handleFilterAction = (orders) => {
     setPage(0);
-    searchOrders(orders);
+    searchOrdersAction(orders);
+  };
+
+  const handleCloseConfirmScheduleRemovalModal = () => {
+    setConfirmModalScheduleRemovalOpen(false);
+  };
+
+  const handleOpenConfirmUpdateOrdersModal = () => {
+    setConfirmModalUpdateOrdersOpen(true);
+  };
+
+  const handleCloseConfirmUpdateOrdersModal = () => {
+    setConfirmModalUpdateOrdersOpen(false);
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - schedulesData.length) : 0;
@@ -322,11 +398,16 @@ export default function RePurchasePage() {
 
         <Card>
           <RePurchaseListToolbar
-            numSelected={selected.length}
+            numSelected={selectedSchedules.length}
             onFilterOrdersChange={handleFilterAction}
-            loading={searchingOrders}
             vendorSelected={rePurchaseWithVendor}
-            onDeleteSchedules={deleteSchedulesAction}
+            onDeleteSchedules={handleDeleteSchedulesAction}
+            onUpdateOrders={handleConfirmUpdateOrdersToRepurchaseAction}
+            deletingSchedules={isDeletingSchedules}
+            updatingOrders={isUpdatingOrdersToRepurchase}
+            searchOrders={searchOrders}
+            selectedOrders={selectedOrders}
+            setSearchOrders={setSearchOrders}
           />
 
           <Scrollbar>
@@ -337,14 +418,16 @@ export default function RePurchasePage() {
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
                   rowCount={schedulesData.length}
-                  numSelected={selected.length}
+                  numSelected={selectedSchedules.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
+                  tableLoading={searchingOrdersLoading || isDeletingSchedules || isUpdatingOrdersToRepurchase}
+                  searchAction={searchOrdersTrigger}
                 />
                 <TableBody>
                   {filteredSchedules.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, orderId, robot, orderStatus, scheduleStatus, created, note } = row;
-                    const selectedSchedule = selected.indexOf(id) !== -1;
+                    const { id, orderId, robot, orderStatus, scheduleStatus, created } = row;
+                    const selectedSchedule = selectedSchedules.indexOf(id) !== -1;
 
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedSchedule}>
@@ -461,6 +544,42 @@ export default function RePurchasePage() {
           Delete
         </MenuItem>
       </Popover>
+
+      <Dialog open={confirmModalScheduleRemovalOpen} onClose={handleCloseConfirmScheduleRemovalModal}>
+        <DialogTitle>Confirm schedules removal</DialogTitle>
+        <DialogContent>
+          <Typography variant={'body2'} color={'textSecondary'}>
+            {`You will delete some schedules to create a re-purchase with ${rePurchaseWithVendor.toUpperCase()}. This process can not be undone.`}
+          </Typography>
+          <Typography variant={'body2'} color={'textSecondary'} sx={{ mt: 2 }}>
+            {`${selectedSchedules?.length} schedules will be deleted. Please confirm to continue.`}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmScheduleRemovalModal}>Cancel</Button>
+          <Button onClick={deleteScheduleAction} autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={confirmModalUpdateOrdersOpen} onClose={handleCloseConfirmUpdateOrdersModal}>
+        <DialogTitle>Confirm update orders to re-purchase</DialogTitle>
+        <DialogContent>
+          <Typography variant={'body2'} color={'textSecondary'}>
+            {`You will update the orders to BUYING to create a re-purchase with ${rePurchaseWithVendor.toUpperCase()}. This process can not be undone.`}
+          </Typography>
+          <Typography variant={'body2'} color={'textSecondary'} sx={{ mt: 2 }}>
+            {`${selectedOrders?.length} orders will be updated. Please confirm to continue.`}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmUpdateOrdersModal}>Cancel</Button>
+          <Button onClick={updateOrdersToRePurchaseAction} autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

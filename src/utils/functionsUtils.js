@@ -1,4 +1,28 @@
-export const parseSearchInput = (input) => input.replace(/['"\n]/g, '').split(/[\s,]+/);
+// export const parseSearchInput = (input) => input.replace(/['"\n]/g, '').split(/[\s,]+/);
+
+export const parseSearchInput = (input) => {
+  // Divide la entrada en valores usando espacios, comas, punto y coma y comillas como separadores
+  let ordersValues = input.split(/[\s,;'"]+/);
+
+  // Mapea los valores para eliminar los caracteres especiales de cada valor
+  ordersValues = ordersValues.map((valor) => {
+    // Reemplaza los caracteres especiales con una cadena vacía
+    return valor.replace(/[^\w\s]/gi, '');
+  });
+
+  // Filtra los valores para eliminar los que son cadenas vacías o que contienen solo espacios en blanco
+  ordersValues = ordersValues.filter((valor) => {
+    return valor.trim() !== '';
+  });
+
+  // Convertir todos los valores a uppercase
+  ordersValues = ordersValues.map((value) => value.toUpperCase());
+
+  // Eliminar elementos duplicados
+  ordersValues = [...new Set(ordersValues)];
+
+  return ordersValues;
+};
 
 export const getAbbreviation = (str, maxLength = 3) => {
   let abbreviation = '';

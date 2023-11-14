@@ -106,6 +106,17 @@ export const api = createApi({
         };
       },
     }),
+    updateOrdersToRePurchase: build.mutation({
+      query: (orders) => {
+        return {
+          url: `/management/update-orders-re-purchase-group`,
+          body: {
+            orders,
+          },
+          method: 'POST',
+        };
+      },
+    }),
   }),
 });
 
@@ -123,4 +134,5 @@ export const {
   useGetOrderFinalInfoForOrderQuery,
   useGetOrderRobotsInfoForOrderQuery,
   useDeleteSchedulesMutation,
+  useUpdateOrdersToRepurchaseMutation,
 } = api;
