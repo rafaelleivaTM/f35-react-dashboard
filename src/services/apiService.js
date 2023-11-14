@@ -32,8 +32,9 @@ const apiService = {
 
     return response.json();
   },
-  importOrders: async (orders) => {
-    const response = await fetch(`${F35_API_URL}/management/import-orders`, {
+  importOrders: async (orders, sync) => {
+    const url = sync ? `${F35_API_URL}/management/import-orders?sync=true` : `${F35_API_URL}/management/import-orders`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

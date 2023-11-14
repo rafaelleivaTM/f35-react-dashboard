@@ -5,9 +5,11 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   CircularProgress,
   Collapse,
   Divider,
+  FormControlLabel,
   InputAdornment,
   List,
   ListItemButton,
@@ -51,6 +53,7 @@ const ImportOrdersForm = () => {
   const [loading, setLoading] = useState(false);
   const [importCompleted, setImportCompleted] = useState(false);
   const [ordersImportResults, setOrdersImportResults] = useState([]);
+  const [syncOrders, setSyncOrders] = useState(false);
 
   const [open, setOpen] = React.useState({});
 
@@ -86,13 +89,14 @@ const ImportOrdersForm = () => {
     setLoading(true);
     setOrdersImportResults([]);
     apiService
-      .importOrders(orders)
+      .importOrders(orders, syncOrders)
       .then((response) => {
         console.log('response from importOrders', response);
         if (response?.data && response.statusCode === 200) {
           setOrders('');
           inputRef.current.querySelector('input').value = '';
           setImportCompleted(true);
+          setSyncOrders(false);
         } else {
           setImportCompleted(false);
         }
@@ -183,12 +187,16 @@ const ImportOrdersForm = () => {
               </Button>
             </Box>
           </Stack>
+          <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} sx={{ my: 3 }}>
+            <Typography variant={'caption'} sx={{ color: hasErrorInImports ? 'rgb(248,29,56)' : 'inherit' }}>
+              {loading ? 'Importing' : ordersImportResults.length === 0 ? 'Start process' : getImportFinishMessage()}
+            </Typography>
+            <FormControlLabel
+              control={<Checkbox size={'small'} onChange={(event) => setSyncOrders(event.target.checked)} />}
+              label="Sync orders"
+            />
+          </Stack>
         </form>
-        <Stack direction={'row'} justifyContent={'space-between'} sx={{ my: 3 }}>
-          <Typography variant={'caption'} sx={{ color: hasErrorInImports ? 'rgb(248,29,56)' : 'inherit' }}>
-            {loading ? 'Importing' : ordersImportResults.length === 0 ? 'Start process' : getImportFinishMessage()}
-          </Typography>
-        </Stack>
 
         <Scrollbar sx={{ height: { xs: 240, sm: 350, lg: 450 } }}>
           <Stack spacing={1} sx={{ p: 0 }}>
