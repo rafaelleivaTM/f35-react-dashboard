@@ -96,7 +96,6 @@ const ImportOrdersForm = () => {
           setOrders('');
           inputRef.current.querySelector('input').value = '';
           setImportCompleted(true);
-          setSyncOrders(false);
         } else {
           setImportCompleted(false);
         }
@@ -107,6 +106,7 @@ const ImportOrdersForm = () => {
       })
       .finally(() => {
         setLoading(false);
+        setSyncOrders(false);
       });
   };
 
@@ -192,7 +192,13 @@ const ImportOrdersForm = () => {
               {loading ? 'Importing' : ordersImportResults.length === 0 ? 'Start process' : getImportFinishMessage()}
             </Typography>
             <FormControlLabel
-              control={<Checkbox size={'small'} onChange={(event) => setSyncOrders(event.target.checked)} />}
+              control={
+                <Checkbox
+                  checked={syncOrders}
+                  size={'small'}
+                  onChange={(event) => setSyncOrders(event.target.checked)}
+                />
+              }
               label="Sync tables"
             />
           </Stack>
