@@ -40,6 +40,7 @@ import { BRAND_COLORS, F35_ROBOTS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_
 import { getAbbreviation } from "../utils/functionsUtils";
 import LetterAvatar from "../components/letter-avatar";
 import { api } from "../redux/api/apiSlice";
+import UpdatePurchaseMethodScheduleDialog from "../sections/re-purchase/dialogs/UpdatePurchaseMethodScheduleDialog";
 
 // ----------------------------------------------------------------------
 
@@ -102,7 +103,7 @@ export default function RePurchasePage() {
 
   const [rePurchaseWithVendor, setRePurchaseWithVendor] = useState('');
 
-  const [searchOrders, setSearchOrders] = useState('');
+  const [searchOrders, setSearchOrders] = useState([]);
 
   const [schedulesData, setSchedulesData] = useState([]);
 
@@ -110,6 +111,16 @@ export default function RePurchasePage() {
   const [confirmModalUpdateOrdersOpen, setConfirmModalUpdateOrdersOpen] = useState(false);
 
   const [searchingOrdersLoading, setSearchingOrdersLoading] = useState(false);
+
+  const [openEditPurchaseMethodScheduleDialog, setOpenEditPurchaseMethodScheduleDialog] = useState(false);
+
+  const handleClickOpenUpdatePurchaseMethodScheduleDialog = () => {
+    setOpenEditPurchaseMethodScheduleDialog(true);
+  };
+
+  const handleClosePurchaseMethodScheduleDialog = () => {
+    setOpenEditPurchaseMethodScheduleDialog(false);
+  };
 
   const f35SchedulesMetadata = useSelector((state) => state.appConfig.f35SchedulesMetadata);
 
@@ -153,7 +164,7 @@ export default function RePurchasePage() {
     }
   }, [rePurchaseWithVendor, schedulesData]);
 
-  const handleDeleteSchedulesAction = () => {
+  const handleConfirmDeleteSchedulesAction = () => {
     setConfirmModalScheduleRemovalOpen(true);
   };
 
@@ -409,7 +420,8 @@ export default function RePurchasePage() {
             numSelected={selectedSchedules.length}
             onFilterOrdersChange={handleFilterAction}
             vendorSelected={rePurchaseWithVendor}
-            onDeleteSchedules={handleDeleteSchedulesAction}
+            onUpdateSchedule={handleClickOpenUpdatePurchaseMethodScheduleDialog}
+            onDeleteSchedules={handleConfirmDeleteSchedulesAction}
             onUpdateOrders={handleConfirmUpdateOrdersToRepurchaseAction}
             deletingSchedules={isDeletingSchedules}
             updatingOrders={isUpdatingOrdersToRepurchase}
@@ -590,6 +602,11 @@ export default function RePurchasePage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <UpdatePurchaseMethodScheduleDialog
+        open={openEditPurchaseMethodScheduleDialog}
+        onClose={handleClosePurchaseMethodScheduleDialog}
+      />
     </>
   );
 }

@@ -42,6 +42,7 @@ RePurchaseListToolbar.propTypes = {
   onFilterOrdersChange: PropTypes.func,
   onDeleteSchedules: PropTypes.func,
   onUpdateOrders: PropTypes.func,
+  onUpdateSchedule: PropTypes.func,
   loading: PropTypes.bool,
   deletingSchedules: PropTypes.bool,
   updatingOrders: PropTypes.bool,
@@ -58,6 +59,7 @@ export default function RePurchaseListToolbar({
   onFilterOrdersChange,
   onDeleteSchedules,
   onUpdateOrders,
+  onUpdateSchedule,
   searchOrders,
   selectedOrders,
   setSearchOrders,
@@ -87,6 +89,10 @@ export default function RePurchaseListToolbar({
 
   const handleUpdateOrdersAction = () => {
     onUpdateOrders();
+  };
+
+  const handleUpdateScheduleAction = () => {
+    onUpdateSchedule();
   };
 
   return (
@@ -127,6 +133,15 @@ export default function RePurchaseListToolbar({
             disabled={selectedOrders.length === 0}
           >
             Delete Schedules
+          </Button>
+          <Button
+            variant="contained"
+            color={'warning'}
+            startIcon={<Iconify icon="eva:refresh-fill" />}
+            onClick={handleUpdateScheduleAction}
+            disabled={selectedOrders.length === 0}
+          >
+            Update Schedules
           </Button>
           <Button
             variant="contained"

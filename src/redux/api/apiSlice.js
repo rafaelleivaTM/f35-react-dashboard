@@ -96,26 +96,30 @@ export const api = createApi({
       transformResponse: (response) => response?.data || [],
     }),
     deleteSchedules: build.mutation({
-      query: (ids) => {
-        return {
-          url: `/management/schedules`,
-          body: {
-            ids,
-          },
-          method: 'DELETE',
-        };
-      },
+      query: (ids) => ({
+        url: `/management/schedules`,
+        body: {
+          ids,
+        },
+        method: 'DELETE',
+      }),
     }),
     updateOrdersToRePurchase: build.mutation({
-      query: (orders) => {
-        return {
-          url: `/management/update-orders-re-purchase-group`,
-          body: {
-            orders,
-          },
-          method: 'POST',
-        };
-      },
+      query: (orders) => ({
+        url: `/management/update-orders-re-purchase-group`,
+        body: {
+          orders,
+        },
+        method: 'POST',
+      }),
+    }),
+    updateSchedule: build.mutation({
+      // params = {schedules, data}
+      query: (params) => ({
+        url: `/management/update-schedule`,
+        body: params,
+        method: 'POST',
+      }),
     }),
   }),
 });
