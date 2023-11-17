@@ -24,7 +24,7 @@ export default function Router() {
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'orders', element: <OrdersPage /> },
         { path: 'order-details/:orderId?', element: <OrderDetailsPage /> },
-        { path: 're-buy', element: <RePurchasePage /> },
+        { path: 're-purchase', element: <RePurchasePage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'tools', element: <ToolsPage /> },
       ],

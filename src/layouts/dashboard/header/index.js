@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 // @mui
 import { styled } from "@mui/material/styles";
-import { AppBar, Box, Divider, IconButton, Stack, Toolbar } from "@mui/material";
+import { AppBar, Box, Divider, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 // utils
 import { bgBlur } from "../../../utils/cssStyles";
 // components
@@ -13,6 +13,7 @@ import NotificationsPopover from "./NotificationsPopover";
 import { DateRangePickerToolbar } from "./DateRangePickerToolbar";
 import CronRefreshStats from "../../../components/scheduler_api_call/CronRefreshStats";
 import LanguagePopover from "./LanguagePopover";
+import { useGetHealthApiServiceQuery } from "../../../redux/api/apiSlice";
 
 // ----------------------------------------------------------------------
 
@@ -45,6 +46,8 @@ Header.propTypes = {
 };
 
 export default function Header({ onOpenNav }) {
+  const { data: healthApi } = useGetHealthApiServiceQuery(undefined);
+
   return (
     <StyledRoot>
       <StyledToolbar>
@@ -70,6 +73,18 @@ export default function Header({ onOpenNav }) {
             sm: 1,
           }}
         >
+          <Stack direction={'row'} spacing={3} marginRight={3}>
+            <Typography variant={'caption'} color="text.secondary">
+              DB Read: {healthApi?.dbRead}
+            </Typography>
+            <Typography
+              variant={'caption'}
+              color={healthApi?.isProdActive ? 'error' : 'text.secondary'}
+              fontWeight={healthApi?.isProdActive ? 'bold' : 'normal'}
+            >
+              DB Write: {healthApi?.dbWrite}
+            </Typography>
+          </Stack>
           <CronRefreshStats />
           <Divider orientation={'vertical'} variant={'middle'} flexItem />
           <DateRangePickerToolbar />

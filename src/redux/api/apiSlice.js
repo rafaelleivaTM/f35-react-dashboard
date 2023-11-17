@@ -9,6 +9,10 @@ export const api = createApi({
     baseUrl: `${process.env.REACT_APP_API_URL}/f35`,
   }),
   endpoints: (build) => ({
+    getHealthApiService: build.query({
+      query: () => `/health`,
+      transformResponse: (response) => response?.data,
+    }),
     getSchedulesGroupsAndMethodsMap: build.query({
       query: () => '/data/getSchedulesGroupsAndMethodsMap',
     }),
@@ -125,6 +129,7 @@ export const api = createApi({
 });
 
 export const {
+  useGetHealthApiServiceQuery,
   useGetSchedulesGroupsAndMethodsMapQuery,
   useGetWarehouseMetaDataQuery,
   useGetF35GeneralSummaryQuery,

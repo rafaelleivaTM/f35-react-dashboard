@@ -89,11 +89,14 @@ export default function OrdersPage() {
   const searchOrders = useSelector((state) => state.searchOrders.searched);
   const filter = useSelector((state) => state.searchOrders.filter);
 
-  let { data: listedOrders } = useSearchOrdersInF35Query({
+  const {
+    data: listedOrders = [],
+    refetch: refetchOrders,
+    isLoading: isSearchingOrders,
+  } = useSearchOrdersInF35Query({
     orders: searchOrders,
     filter,
   });
-  listedOrders = listedOrders || [];
 
   const [open, setOpen] = useState(null);
 
@@ -121,6 +124,10 @@ export default function OrdersPage() {
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+  };
+
+  const searchOrdersTrigger = () => {
+    refetchOrders();
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -249,6 +256,8 @@ export default function OrdersPage() {
                   rowCount={listedOrders?.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
+                  onUpdateTableData={searchOrdersTrigger}
+                  tableLoading={isSearchingOrders}
                 />
                 <TableBody>
                   {listedOrders.map((row) => {

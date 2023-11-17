@@ -23,7 +23,7 @@ const navConfig = [
   },
   {
     title: 'Re-Purchase',
-    path: '/dashboard/re-buy',
+    path: '/dashboard/re-purchase',
     icon: icon('ic_cart'),
   },
   // {
