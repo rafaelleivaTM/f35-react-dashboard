@@ -110,7 +110,7 @@ export const api = createApi({
     }),
     updateOrdersToRePurchase: build.mutation({
       query: (orders) => ({
-        url: `/management/update-orders-re-purchase-group`,
+        url: `/management/update-orders-re-purchase`,
         body: {
           orders,
         },

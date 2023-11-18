@@ -6,26 +6,28 @@ import { api } from '../../../redux/api/apiSlice';
 
 UpdatePurchaseMethodScheduleDialog.propsTypes = {
   onSubmitSchedule: PropsTypes.func,
-  schedulesSelected: PropsTypes.array,
+  selectedSchedules: PropsTypes.array,
   open: PropsTypes.bool,
   onClose: PropsTypes.func,
 };
-export default function UpdatePurchaseMethodScheduleDialog({ onSubmitSchedule, schedulesSelected, open, onClose }) {
+export default function UpdatePurchaseMethodScheduleDialog({ onSubmitSchedule, selectedSchedules, open, onClose }) {
   const [formScheduleState, setFormScheduleState] = useState({
     status: '',
     evaluate_next: '',
     attempt: '',
     note: '',
     po_info_completed: '',
+    resetNote: false,
   });
 
   const [updateSchedule, { isLoading: isUpdatingSchedule, isError, error }] =
     api.endpoints.updateSchedule.useMutation();
 
   const handleChange = (event) => {
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     setFormScheduleState({
       ...formScheduleState,
-      [event.target.name]: event.target.value,
+      [event.target.name]: value,
     });
   };
 
@@ -42,10 +44,11 @@ export default function UpdatePurchaseMethodScheduleDialog({ onSubmitSchedule, s
       formScheduleState.attempt ||
       formScheduleState.note ||
       formScheduleState.po_info_completed ||
-      formScheduleState.status
+      formScheduleState.status ||
+      formScheduleState.resetNote
     ) {
       updateSchedule({
-        schedules: schedulesSelected,
+        schedules: selectedSchedules,
         data: formScheduleState,
       })
         .then((response) => {

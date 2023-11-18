@@ -139,6 +139,15 @@ export default function RePurchasePage() {
       setSelectedOrders(orders);
     };
 
+    const selectMIRASchedules = () => {
+      const schedules = [...schedulesData];
+      const robotSchedules = schedules.filter((sched) => sched.robot > 27).map((sched) => sched.id);
+      let orders = schedules.filter((sched) => sched.robot > 27).map((sched) => sched.orderId);
+      orders = [...new Set(orders)];
+      setSelectedSchedules(robotSchedules);
+      setSelectedOrders(orders);
+    };
+
     if (rePurchaseWithVendor && schedulesData && schedulesData.length > 0) {
       switch (rePurchaseWithVendor) {
         case 'amz': {
@@ -154,7 +163,7 @@ export default function RePurchasePage() {
           break;
         }
         case 'mira': {
-          // todo
+          selectMIRASchedules();
           break;
         }
 
@@ -162,7 +171,7 @@ export default function RePurchasePage() {
           break;
       }
     }
-  }, [rePurchaseWithVendor, schedulesData]);
+  }, [rePurchaseWithVendor]);
 
   const handleConfirmDeleteSchedulesAction = () => {
     setConfirmModalScheduleRemovalOpen(true);
@@ -185,18 +194,18 @@ export default function RePurchasePage() {
   };
 
   const deleteSingleSchedule = (id) => {
-    deleteSchedules([id])
-      .then((response) => {
-        if (response?.data && response.data.statusCode === 200) {
-          searchOrdersTrigger();
-          console.log('Response success from deleteSingleSchedule', response);
-        } else {
-          console.error('Response fail from deleteSingleSchedule', response);
-        }
-      })
-      .catch((error) => {
-        console.log('error from deleteSingleSchedule', error);
-      });
+    // deleteSchedules([id])
+    //   .then((response) => {
+    //     if (response?.data && response.data.statusCode === 200) {
+    //       searchOrdersTrigger();
+    //       console.log('Response success from deleteSingleSchedule', response);
+    //     } else {
+    //       console.error('Response fail from deleteSingleSchedule', response);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log('error from deleteSingleSchedule', error);
+    //   });
   };
 
   const handleConfirmUpdateOrdersToRepurchaseAction = () => {
@@ -217,6 +226,14 @@ export default function RePurchasePage() {
       .catch((error) => {
         console.log('error from updateOrdersToRePurchase', error);
       });
+  };
+
+  const editSingleSchedule = (schedId) => {
+    setSelectedSchedules([schedId]);
+    const order = schedulesData.find((sched) => sched.id === schedId).orderId;
+    setSelectedOrders([order]);
+    handleClickOpenUpdatePurchaseMethodScheduleDialog();
+    setOpen(false);
   };
 
   const searchOrdersTrigger = () => {
@@ -336,7 +353,6 @@ export default function RePurchasePage() {
       return;
     }
     setSelectedSchedules([]);
-    setSearchOrders([]);
   };
 
   const handleClick = (event, name) => {
@@ -406,7 +422,7 @@ export default function RePurchasePage() {
         <title> Re-Purchase </title>
       </Helmet>
 
-      <Container>
+      <Container maxWidth={'xl'}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             Re-Purchase Orders
@@ -556,7 +572,7 @@ export default function RePurchasePage() {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => editSingleSchedule(open.schedId)}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
@@ -606,6 +622,8 @@ export default function RePurchasePage() {
       <UpdatePurchaseMethodScheduleDialog
         open={openEditPurchaseMethodScheduleDialog}
         onClose={handleClosePurchaseMethodScheduleDialog}
+        selectedSchedules={selectedSchedules}
+        onSubmitSchedule={searchOrdersTrigger}
       />
     </>
   );

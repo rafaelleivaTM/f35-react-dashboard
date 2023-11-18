@@ -125,15 +125,15 @@ export default function RePurchaseListToolbar({
 
       {numSelected > 0 ? (
         <Stack direction={'row'} spacing={3}>
-          <Button
-            variant="contained"
-            color={'error'}
-            startIcon={<Iconify icon="eva:trash-2-fill" />}
-            onClick={handleDeleteScheduleAction}
-            disabled={selectedOrders.length === 0}
-          >
-            Delete Schedules
-          </Button>
+          {/* <Button */}
+          {/*  variant="contained" */}
+          {/*  color={'error'} */}
+          {/*  startIcon={<Iconify icon="eva:trash-2-fill" />} */}
+          {/*  onClick={handleDeleteScheduleAction} */}
+          {/*  disabled={selectedOrders.length === 0} */}
+          {/* > */}
+          {/*  Delete Schedules */}
+          {/* </Button> */}
           <Button
             variant="contained"
             color={'warning'}

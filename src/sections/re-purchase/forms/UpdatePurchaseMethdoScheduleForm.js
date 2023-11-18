@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid, Stack, TextField } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, Grid, Stack, TextField } from '@mui/material';
 import * as PropsTypes from 'prop-types';
 
 UpdatePurchaseMethodScheduleForm.propsTypes = {
@@ -67,6 +67,15 @@ export default function UpdatePurchaseMethodScheduleForm({ onCloseModal, formSta
           />
         </Grid>
         <Grid item xs={12}>
+          <FormControlLabel
+            name={'resetNote'}
+            checked={formState.resetNote}
+            onChange={handleChange}
+            control={<Checkbox />}
+            label="Reset Note"
+          />
+        </Grid>
+        <Grid item xs={12}>
           <TextField
             name="note"
             label="Note"
@@ -89,7 +98,8 @@ export default function UpdatePurchaseMethodScheduleForm({ onCloseModal, formSta
             (!formState.evaluate_next || formState.evaluate_next === '') &&
             (!formState.attempt || formState.attempt === '') &&
             (!formState.po_info_completed || formState.po_info_completed === '') &&
-            (!formState.note || formState.note === '')
+            (!formState.note || formState.note === '') &&
+            !formState.resetNote
           }
         >
           Update
