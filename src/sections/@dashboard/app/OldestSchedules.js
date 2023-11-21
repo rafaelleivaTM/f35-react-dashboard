@@ -64,7 +64,7 @@ export default function OldestSchedules({ title, subheader, loading, data, ...ot
       <Tabs value={value} onChange={handleChange} sx={{ mt: 1 }}>
         {data && Object.keys(data).map((key, index) => <Tab label={key} key={index} />)}
       </Tabs>
-      <Scrollbar sx={{ height: { xs: 340, sm: 550, lg: 800 } }}>
+      <Scrollbar sx={{ height: { xs: 340, sm: 550, lg: 750 } }}>
         {data &&
           Object.keys(data).length > 0 &&
           Object.keys(data).map((key, index) => (
