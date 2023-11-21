@@ -99,6 +99,14 @@ export const api = createApi({
       query: (orderId) => `/data/getOrderRobotsInfo?order=${orderId}`,
       transformResponse: (response) => response?.data || [],
     }),
+    getActiveOrders: build.query({
+      query: () => `/data/getActiveOrders`,
+      transformResponse: (response) => (response?.data ? response.data[0] : {}),
+    }),
+    getOldestSchedules: build.query({
+      query: () => `/data/getOldSchedules`,
+      transformResponse: (response) => response?.data || {},
+    }),
     deleteSchedules: build.mutation({
       query: (ids) => ({
         url: `/management/schedules`,
@@ -142,4 +150,6 @@ export const {
   useGetOrderProductsForOrderQuery,
   useGetOrderFinalInfoForOrderQuery,
   useGetOrderRobotsInfoForOrderQuery,
+  useGetActiveOrdersQuery,
+  useGetOldestSchedulesQuery,
 } = api;

@@ -13,7 +13,6 @@ import {
   Typography
 } from "@mui/material"; // utils
 import { useState } from "react";
-import { fDateTime } from "../../../utils/formatTime"; // components
 import Iconify from "../../../components/iconify";
 import Scrollbar from "../../../components/scrollbar";
 import LetterAvatar from "../../../components/letter-avatar";
@@ -105,9 +104,9 @@ function ErrorItem({ error }) {
 
       <Stack alignItems={'end'} spacing={2}>
         <Badge color={'error'} badgeContent={count} sx={{ mr: 3 }} />
-        <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }} noWrap>
-          {fDateTime(new Date(postedAt))}
-        </Typography>
+        {/* <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }} noWrap> */}
+        {/*  {fDateTime(new Date(postedAt))} */}
+        {/* </Typography> */}
       </Stack>
     </Stack>
   );

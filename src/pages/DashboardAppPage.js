@@ -18,12 +18,15 @@ import { F35_ROBOTS, STATUS_COLORS } from "../utils/constants";
 import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
 import { addNotification } from "../redux/notificationsSlice";
 import {
+  useGetActiveOrdersQuery,
   useGetF35GeneralSummaryQuery,
+  useGetOldestSchedulesQuery,
   useGetSummaryEfficiencyByRobotQuery,
   useIncomingOrdersByRangeQuery,
   useRobotsErrorInfoQuery
 } from "../redux/api/apiSlice";
 import { getDateFormatted } from "../utils/formatTime";
+import OldestSchedules from "../sections/@dashboard/app/OldestSchedules";
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +47,19 @@ export default function DashboardAppPage() {
   const [totalManualWidget, setTotalManualWidget] = useState(0);
   const [totalSuccessfullyWidget, setTotalSuccessfullyWidget] = useState(0);
   const [totalSuccessfullyMiraOrders, setTotalSuccessfullyMiraOrders] = useState(0);
+  const [totalActiveOrders, setTotalActiveOrders] = useState(0);
+
+  const { data: activeOrders } = useGetActiveOrdersQuery(undefined);
+  if (activeOrders && +activeOrders.active !== totalActiveOrders) {
+    setTotalActiveOrders(+activeOrders.active);
+  }
+
+  const {
+    data: oldestSchedules,
+    isLoading: loadingOldestSchedules,
+    isFetching: fetchingOldestSchedules,
+  } = useGetOldestSchedulesQuery(undefined);
+  if (oldestSchedules) console.log(`Response of oldestSchedules`, oldestSchedules);
 
   const date = getDateFormatted();
   const {
@@ -178,7 +194,7 @@ export default function DashboardAppPage() {
 
       <Container maxWidth="xl">
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs>
             <AppWidgetSummary
               title="Mirak Success"
               total={totalSuccessfullyMiraOrders}
@@ -186,7 +202,7 @@ export default function DashboardAppPage() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs>
             <AppWidgetSummary
               title="Successfull Orders"
               total={totalSuccessfullyWidget}
@@ -195,7 +211,7 @@ export default function DashboardAppPage() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs>
             <AppWidgetSummary
               title="Manual Orders"
               total={totalManualWidget}
@@ -204,8 +220,17 @@ export default function DashboardAppPage() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs>
             <AppWidgetSummary title="Errors" total={totalErrorsWidget} color="error" icon={'ant-design:bug-filled'} />
+          </Grid>
+
+          <Grid item xs>
+            <AppWidgetSummary
+              title="Active Orders"
+              total={totalActiveOrders}
+              color="info"
+              icon={'fluent-mdl2:time-entry'}
+            />
           </Grid>
 
           <Grid item xs={12} md={8} lg={9}>
@@ -261,7 +286,7 @@ export default function DashboardAppPage() {
               />
 
               <AppErrorList
-                title="Errores"
+                title="Errors"
                 list={robotsErrorInfo || []}
                 loading={loadingRobotErrors || fetchingRobotErrors}
               />
@@ -428,6 +453,14 @@ export default function DashboardAppPage() {
               {/*  ]} */}
               {/* /> */}
             </Stack>
+          </Grid>
+
+          <Grid item xs={12}>
+            <OldestSchedules
+              title={'Oldest Schedules'}
+              data={oldestSchedules || {}}
+              loading={loadingOldestSchedules || fetchingOldestSchedules}
+            />
           </Grid>
         </Grid>
       </Container>

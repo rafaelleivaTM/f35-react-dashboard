@@ -7,7 +7,9 @@ import { F35_ROBOTS, getScheduleCronInterval } from '../../utils/constants';
 import { updateCronRefreshStatsInterval, updateCronRefreshStatsStatus } from '../../redux/appConfigSlice';
 import { getDateFormatted } from '../../utils/formatTime';
 import {
+  useGetActiveOrdersQuery,
   useGetF35GeneralSummaryQuery,
+  useGetOldestSchedulesQuery,
   useGetSummaryEfficiencyByRobotQuery,
   useRobotsErrorInfoQuery,
 } from '../../redux/api/apiSlice';
@@ -34,6 +36,8 @@ const CronRefreshStats = () => {
   const { refetch: refetchRobotsErrorInfo } = useRobotsErrorInfoQuery(dateRange, {
     skip: !dateRange,
   });
+  const { refetch: refetchActiveOrders } = useGetActiveOrdersQuery(undefined);
+  const { refetch: refetchOldestSchedules } = useGetOldestSchedulesQuery(undefined);
   // const { refetch: refetchIncomingOrdersByRange } = useGetIncomingOrdersByRange(dateRange, {
   //   skip: !dateRange,
   // });
@@ -54,6 +58,8 @@ const CronRefreshStats = () => {
           refetchEbaySummaryStats();
           refetchMiraSummaryStats();
           refetchRobotsErrorInfo();
+          refetchActiveOrders();
+          refetchOldestSchedules();
           // refetchIncomingOrdersByRange();
         }, interval);
       }
@@ -71,6 +77,8 @@ const CronRefreshStats = () => {
     refetchEbaySummaryStats,
     refetchMiraSummaryStats,
     refetchRobotsErrorInfo,
+    refetchActiveOrders,
+    refetchOldestSchedules,
     // refetchIncomingOrdersByRange,
   ]);
 
