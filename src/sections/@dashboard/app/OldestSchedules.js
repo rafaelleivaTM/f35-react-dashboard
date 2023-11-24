@@ -62,7 +62,7 @@ export default function OldestSchedules({ title, subheader, loading, data, ...ot
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} action={loading ? <CircularProgress size={30} /> : <></>} />
       <Tabs value={value} onChange={handleChange} sx={{ mt: 1 }}>
-        {data && Object.keys(data).map((key, index) => <Tab label={key} key={index} />)}
+        {data && Object.keys(data).length > 0 && Object.keys(data).map((key, index) => <Tab label={key} key={index} />)}
       </Tabs>
       <Scrollbar sx={{ height: { xs: 340, sm: 550, lg: 750 } }}>
         {data &&
@@ -73,9 +73,11 @@ export default function OldestSchedules({ title, subheader, loading, data, ...ot
                 <Table>
                   <TableHead>
                     <TableRow>
-                      {Object.keys(data[key][0]).map((columnKey) => (
-                        <TableCell key={columnKey}>{columnKey}</TableCell>
-                      ))}
+                      {Object.keys(data[key]).length > 0 &&
+                        Object.keys(data[key][0]).length > 0 &&
+                        Object.keys(data[key][0]).map((columnKey) => (
+                          <TableCell key={columnKey}>{columnKey}</TableCell>
+                        ))}
                     </TableRow>
                   </TableHead>
                   <TableBody>

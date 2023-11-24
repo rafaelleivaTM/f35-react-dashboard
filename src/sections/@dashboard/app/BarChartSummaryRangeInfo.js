@@ -95,7 +95,7 @@ export default function BarChartSummaryRangeInfo({ title, subheader, chartData, 
       offsetY: 40,
     },
     yaxis: {
-      logarithmic: true,
+      logarithmic: false,
       title: {
         text: 'Procesadas',
       },
