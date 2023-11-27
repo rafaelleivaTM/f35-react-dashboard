@@ -103,6 +103,10 @@ export const api = createApi({
       query: () => `/data/getActiveOrders`,
       transformResponse: (response) => (response?.data ? response.data[0] : {}),
     }),
+    getWaitingPaymentOrders: build.query({
+      query: () => `/data/getWaitingPaymentOrders`,
+      transformResponse: (response) => (response?.data ? response.data[0] : {}),
+    }),
     getOldestSchedules: build.query({
       query: () => `/data/getOldSchedules`,
       transformResponse: (response) => response?.data || {},
@@ -151,5 +155,6 @@ export const {
   useGetOrderFinalInfoForOrderQuery,
   useGetOrderRobotsInfoForOrderQuery,
   useGetActiveOrdersQuery,
+  useGetWaitingPaymentOrdersQuery,
   useGetOldestSchedulesQuery,
 } = api;

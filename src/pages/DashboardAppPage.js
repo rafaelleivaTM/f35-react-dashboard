@@ -22,6 +22,7 @@ import {
   useGetF35GeneralSummaryQuery,
   useGetOldestSchedulesQuery,
   useGetSummaryEfficiencyByRobotQuery,
+  useGetWaitingPaymentOrdersQuery,
   useIncomingOrdersByRangeQuery,
   useRobotsErrorInfoQuery
 } from "../redux/api/apiSlice";
@@ -48,10 +49,15 @@ export default function DashboardAppPage() {
   const [totalSuccessfullyWidget, setTotalSuccessfullyWidget] = useState(0);
   const [totalSuccessfullyMiraOrders, setTotalSuccessfullyMiraOrders] = useState(0);
   const [totalActiveOrders, setTotalActiveOrders] = useState(0);
+  const [waitingPaymentOrders, setWaitingPaymentOrders] = useState(0);
 
   const { data: activeOrders } = useGetActiveOrdersQuery(undefined);
   if (activeOrders && +activeOrders.active !== totalActiveOrders) {
     setTotalActiveOrders(+activeOrders.active);
+  }
+  const { data: waitingPaymentData } = useGetWaitingPaymentOrdersQuery(undefined);
+  if (waitingPaymentData && +waitingPaymentData.waitingPayment !== waitingPaymentOrders) {
+    setWaitingPaymentOrders(+waitingPaymentData.waitingPayment);
   }
 
   const {
@@ -228,6 +234,15 @@ export default function DashboardAppPage() {
             <AppWidgetSummary
               title="Active Orders"
               total={totalActiveOrders}
+              color="info"
+              icon={'fluent-mdl2:time-entry'}
+            />
+          </Grid>
+
+          <Grid item xs>
+            <AppWidgetSummary
+              title="Waiting Payment"
+              total={waitingPaymentOrders}
               color="info"
               icon={'fluent-mdl2:time-entry'}
             />
