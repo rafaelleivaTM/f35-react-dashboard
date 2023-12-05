@@ -26,6 +26,7 @@ const CronRefreshStats = () => {
 
   const date = getDateFormatted();
   const { refetch: refetchF35GeneralSummary } = useGetF35GeneralSummaryQuery(date);
+  const { refetch: refetchAmzoSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.AMZO });
   const { refetch: refetchDoSummaryStats } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.DO });
   const { refetch: refetchZincSummaryStats } = useGetSummaryEfficiencyByRobotQuery({
     date,
@@ -53,6 +54,7 @@ const CronRefreshStats = () => {
           console.log(`Update stats running every ${schedulerTimeValue}. Executed now! ${new Date()}`);
 
           refetchF35GeneralSummary();
+          refetchAmzoSummaryStats();
           refetchDoSummaryStats();
           refetchZincSummaryStats();
           refetchEbaySummaryStats();
@@ -72,6 +74,7 @@ const CronRefreshStats = () => {
     schedulerTimeValue,
     dispatch,
     refetchF35GeneralSummary,
+    refetchAmzoSummaryStats,
     refetchDoSummaryStats,
     refetchZincSummaryStats,
     refetchEbaySummaryStats,

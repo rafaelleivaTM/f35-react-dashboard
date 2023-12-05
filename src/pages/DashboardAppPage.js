@@ -83,6 +83,13 @@ export default function DashboardAppPage() {
   }
 
   const {
+    data: amzoSummaryStats,
+    isLoading: loadingAmzoSummaryStats,
+    isFetching: fetchingAmzoSummaryStats,
+  } = useGetSummaryEfficiencyByRobotQuery({ date, robot: F35_ROBOTS.AMZO });
+  if (amzoSummaryStats) console.log(`Response of amzoSummaryStats`, amzoSummaryStats);
+
+  const {
     data: doSummaryStats,
     isLoading: loadingDoSummaryStats,
     isFetching: fetchingDoSummaryStats,
@@ -341,6 +348,24 @@ export default function DashboardAppPage() {
                   },
                 ]}
                 chartColors={STATUS_COLORS}
+              />
+
+              <PieChartRobotStat
+                title="AMZO today"
+                total={parseInt(amzoSummaryStats?.Total, 10) || 0}
+                effectiveness={parseInt(amzoSummaryStats?.Effectiveness, 10) || 0}
+                chartData={[
+                  { label: 'In Progress', value: parseInt(amzoSummaryStats?.InProgress, 10) || 0 },
+                  { label: 'Pending', value: parseInt(amzoSummaryStats?.Pending, 10) || 0 },
+                  { label: 'Failed', value: parseInt(amzoSummaryStats?.Failed, 10) || 0 },
+                  { label: 'Cancelled', value: parseInt(amzoSummaryStats?.Cancelled, 10) || 0 },
+                  { label: 'Warning', value: parseInt(amzoSummaryStats?.Warning, 10) || 0 },
+                  { label: 'Success', value: parseInt(amzoSummaryStats?.Success, 10) || 0 },
+                  { label: 'DevBlocked', value: parseInt(amzoSummaryStats?.DevBlocked, 10) || 0 },
+                ]}
+                chartColors={STATUS_COLORS}
+                loading={loadingAmzoSummaryStats}
+                silenceLoading={!loadingAmzoSummaryStats && fetchingAmzoSummaryStats}
               />
 
               <PieChartRobotStat

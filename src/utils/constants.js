@@ -1,4 +1,6 @@
 export const F35_ROBOTS = {
+  AMZO: 'amzo',
+  AMZO_ID: 80,
   DO: 'do',
   DO_ID: 8,
   ZINC_AMZ: 'zincAMZ',
@@ -17,13 +19,13 @@ export const ROBOTS_VISUAL_DATA = [
     id: 1,
     displayAvatarCode: 'DO',
     name: 'do',
-    color: '#2735ef',
+    color: '#4c75fa',
   },
   {
     id: 2,
     displayAvatarCode: 'ZINC',
     name: 'zincAMZ',
-    color: '#8bc3ea',
+    color: '#75a8f6',
   },
   {
     id: 3,
@@ -56,6 +58,13 @@ export const ROBOTS_VISUAL_DATA = [
     displayAvatarCode: 'STOCK',
     name: 'stock',
     color: '#907f3b',
+    active: false,
+  },
+  {
+    id: 8,
+    displayAvatarCode: 'AMZO',
+    name: 'amzo',
+    color: '#081bf8',
     active: false,
   },
 ];
