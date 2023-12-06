@@ -17,9 +17,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import JsonView from 'react18-json-view';
+import 'react18-json-view/src/style.css';
 import { Helmet } from 'react-helmet-async';
 import { alpha, styled } from '@mui/material/styles';
 import { useState } from 'react';
+import XMLViewer from 'react-xml-viewer';
 import Iconify from '../components/iconify';
 import {
   useGetOrderFinalInfoForOrderQuery,
@@ -170,6 +173,34 @@ const OrderDetailsPage = () => {
     return value;
   };
 
+  const displayAsJson = (robotName, prop) => {
+    switch (robotName.toLowerCase()) {
+      case 'mira':
+        return ['purchase_request', 'purchase_response', 'verify_response'].includes(prop);
+      case 'amzo':
+        return ['purchase_request', 'purchase_response', 'verify_response'].includes(prop);
+      case 'zinc_amz':
+        return ['request', 'response'].includes(prop);
+      default:
+        return false;
+    }
+  };
+
+  const displayAsXml = (robotName, prop) => {
+    switch (robotName.toLowerCase()) {
+      case 'do':
+        return ['request', 'response'].includes(prop);
+      default:
+        return false;
+    }
+  };
+
+  const getXML = (str) => {
+    const srtIndexXmlStart = str.indexOf('<cXML');
+    return str.substring(srtIndexXmlStart);
+    // return str;
+  };
+
   return (
     <>
       <Helmet>
@@ -255,24 +286,42 @@ const OrderDetailsPage = () => {
                     <div key={index}>
                       <Typography variant={'h6'}>{robotName}</Typography>
                       <Grid container spacing={2} sx={{ flexWrap: 'wrap' }}>
-                        {Object.keys(robotData).map((prop, indexR) => (
-                          <Grid item xs={12} sm={'auto'} key={indexR} sx={{ '&': { maxWidth: '100% !important' } }}>
-                            <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
-                              <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
-                                <Typography variant={'body2'}>{prop}</Typography>
-                                <Typography
-                                  variant={'subtitle2'}
-                                  sx={{
-                                    fontSize: '100%',
-                                    wordWrap: 'break-word',
-                                  }}
-                                >
-                                  {renderValue(prop, robotData[prop])}
-                                </Typography>
-                              </Stack>
-                            </TagInfo>
-                          </Grid>
-                        ))}
+                        {Object.keys(robotData).map((prop, indexR) => {
+                          const isJson = displayAsJson(robotName, prop);
+                          const isXml = displayAsXml(robotName, prop);
+                          return (
+                            <Grid
+                              item
+                              xs={12}
+                              sm={isJson ? 12 : 'auto'}
+                              key={indexR}
+                              sx={{ '&': { maxWidth: '100% !important' } }}
+                            >
+                              <TagInfo elevation={3} sx={{ display: 'inline-flex', px: 1 }}>
+                                <Stack alignItems={'start'} sx={{ p: [0, 1] }}>
+                                  <Typography variant={'body2'}>{prop}</Typography>
+                                  {isJson ? (
+                                    <Box sx={{ width: '100%' }}>
+                                      <JsonView src={JSON.parse(robotData[prop])} collapsed={1} />
+                                    </Box>
+                                  ) : isXml ? (
+                                    <XMLViewer xml={getXML(robotData[prop])} collapsible initalCollapsedDepth={1} />
+                                  ) : (
+                                    <Typography
+                                      variant={'subtitle2'}
+                                      sx={{
+                                        fontSize: '100%',
+                                        wordWrap: 'break-word',
+                                      }}
+                                    >
+                                      {renderValue(prop, robotData[prop])}
+                                    </Typography>
+                                  )}
+                                </Stack>
+                              </TagInfo>
+                            </Grid>
+                          );
+                        })}
                       </Grid>
                       {index < orderRobotsInfoData.length - 1 && <Divider sx={{ my: 3 }} />}
                     </div>
