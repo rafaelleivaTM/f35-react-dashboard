@@ -302,7 +302,11 @@ const OrderDetailsPage = () => {
                                   <Typography variant={'body2'}>{prop}</Typography>
                                   {isJson ? (
                                     <Box sx={{ width: '100%' }}>
-                                      <JsonView src={JSON.parse(robotData[prop])} collapsed={1} />
+                                      <JsonView
+                                        src={JSON.parse(robotData[prop])}
+                                        collapsed={1}
+                                        displayArrayKey={false}
+                                      />
                                     </Box>
                                   ) : isXml ? (
                                     <XMLViewer xml={getXML(robotData[prop])} collapsible initalCollapsedDepth={1} />
