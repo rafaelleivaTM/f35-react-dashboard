@@ -11,6 +11,7 @@ import {
   useGetF35GeneralSummaryQuery,
   useGetOldestSchedulesQuery,
   useGetSummaryEfficiencyByRobotQuery,
+  useGetWaitingPaymentOrdersQuery,
   useRobotsErrorInfoQuery,
 } from '../../redux/api/apiSlice';
 
@@ -39,6 +40,7 @@ const CronRefreshStats = () => {
   });
   const { refetch: refetchActiveOrders } = useGetActiveOrdersQuery(undefined);
   const { refetch: refetchOldestSchedules } = useGetOldestSchedulesQuery(undefined);
+  const { refetch: refetchWaitingPaymentOrders } = useGetWaitingPaymentOrdersQuery(undefined);
   // const { refetch: refetchIncomingOrdersByRange } = useGetIncomingOrdersByRange(dateRange, {
   //   skip: !dateRange,
   // });
@@ -62,6 +64,7 @@ const CronRefreshStats = () => {
           refetchRobotsErrorInfo();
           refetchActiveOrders();
           refetchOldestSchedules();
+          refetchWaitingPaymentOrders();
           // refetchIncomingOrdersByRange();
         }, interval);
       }
@@ -82,6 +85,7 @@ const CronRefreshStats = () => {
     refetchRobotsErrorInfo,
     refetchActiveOrders,
     refetchOldestSchedules,
+    refetchWaitingPaymentOrders,
     // refetchIncomingOrdersByRange,
   ]);
 

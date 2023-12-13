@@ -1,9 +1,9 @@
-import { Helmet } from "react-helmet-async";
+import { Helmet } from 'react-helmet-async';
 // @mui
-import { Container, Grid, Stack } from "@mui/material";
+import { Container, Grid, Stack } from '@mui/material';
 // components
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 // sections
 import {
   AppErrorList,
@@ -11,12 +11,12 @@ import {
   AppWidgetSummary,
   DonutChartPanel,
   LineChartsRobotsSummary,
-  PieChartRobotStat
-} from "../sections/@dashboard/app";
-import apiService from "../services/apiService";
-import { F35_ROBOTS, STATUS_COLORS } from "../utils/constants";
-import BarChartSummaryRangeInfo from "../sections/@dashboard/app/BarChartSummaryRangeInfo";
-import { addNotification } from "../redux/notificationsSlice";
+  PieChartRobotStat,
+} from '../sections/@dashboard/app';
+import apiService from '../services/apiService';
+import { F35_ROBOTS, STATUS_COLORS } from '../utils/constants';
+import BarChartSummaryRangeInfo from '../sections/@dashboard/app/BarChartSummaryRangeInfo';
+import { addNotification } from '../redux/notificationsSlice';
 import {
   useGetActiveOrdersQuery,
   useGetF35GeneralSummaryQuery,
@@ -24,10 +24,10 @@ import {
   useGetSummaryEfficiencyByRobotQuery,
   useGetWaitingPaymentOrdersQuery,
   useIncomingOrdersByRangeQuery,
-  useRobotsErrorInfoQuery
-} from "../redux/api/apiSlice";
-import { getDateFormatted } from "../utils/formatTime";
-import OldestSchedules from "../sections/@dashboard/app/OldestSchedules";
+  useRobotsErrorInfoQuery,
+} from '../redux/api/apiSlice';
+import { getDateFormatted } from '../utils/formatTime';
+import OldestSchedules from '../sections/@dashboard/app/OldestSchedules';
 
 // ----------------------------------------------------------------------
 
@@ -59,6 +59,7 @@ export default function DashboardAppPage() {
   if (waitingPaymentData && +waitingPaymentData.waitingPayment !== waitingPaymentOrders) {
     setWaitingPaymentOrders(+waitingPaymentData.waitingPayment);
   }
+  if (waitingPaymentData) console.log(`Response of waitingPaymentData`, waitingPaymentData);
 
   const {
     data: oldestSchedules,
