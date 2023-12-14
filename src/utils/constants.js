@@ -178,3 +178,7 @@ export const BRAND_COLORS = [
     color: '#fe6766',
   },
 ];
+
+export const WarningThresholds = {
+  waitingPayment: 100,
+};

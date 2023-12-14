@@ -14,7 +14,7 @@ import {
   PieChartRobotStat,
 } from '../sections/@dashboard/app';
 import apiService from '../services/apiService';
-import { F35_ROBOTS, STATUS_COLORS } from '../utils/constants';
+import { F35_ROBOTS, STATUS_COLORS, WarningThresholds } from '../utils/constants';
 import BarChartSummaryRangeInfo from '../sections/@dashboard/app/BarChartSummaryRangeInfo';
 import { addNotification } from '../redux/notificationsSlice';
 import {
@@ -49,17 +49,12 @@ export default function DashboardAppPage() {
   const [totalSuccessfullyWidget, setTotalSuccessfullyWidget] = useState(0);
   const [totalSuccessfullyMiraOrders, setTotalSuccessfullyMiraOrders] = useState(0);
   const [totalActiveOrders, setTotalActiveOrders] = useState(0);
-  const [waitingPaymentOrders, setWaitingPaymentOrders] = useState(0);
 
   const { data: activeOrders } = useGetActiveOrdersQuery(undefined);
   if (activeOrders && +activeOrders.active !== totalActiveOrders) {
     setTotalActiveOrders(+activeOrders.active);
   }
   const { data: waitingPaymentData } = useGetWaitingPaymentOrdersQuery(undefined);
-  if (waitingPaymentData && +waitingPaymentData.waitingPayment !== waitingPaymentOrders) {
-    setWaitingPaymentOrders(+waitingPaymentData.waitingPayment);
-  }
-  if (waitingPaymentData) console.log(`Response of waitingPaymentData`, waitingPaymentData);
 
   const {
     data: oldestSchedules,
@@ -200,6 +195,26 @@ export default function DashboardAppPage() {
     fetchMissingOrdersBetweenBPAndF35().then();
   }, [dispatch]);
 
+  useEffect(() => {
+    const warningValueForWaitingPaymentOrders = WarningThresholds.waitingPayment;
+    if (waitingPaymentData) {
+      console.log(`Response of waitingPaymentData`, waitingPaymentData);
+      if (waitingPaymentData.waitingPayment > warningValueForWaitingPaymentOrders) {
+        const criticalNotification = {
+          id: '',
+          title: `Orders waiting payment`,
+          description: `Orders waiting payment has reached the regular limit (${warningValueForWaitingPaymentOrders})`,
+          avatar: null,
+          type: 'order_critical',
+          createdAt: new Date().toISOString(),
+          isUnRead: true,
+          isCritical: true,
+        };
+        dispatch(addNotification(criticalNotification));
+      }
+    }
+  }, [waitingPaymentData]);
+
   return (
     <>
       <Helmet>
@@ -250,7 +265,7 @@ export default function DashboardAppPage() {
           <Grid item xs>
             <AppWidgetSummary
               title="Waiting Payment"
-              total={waitingPaymentOrders}
+              total={+waitingPaymentData?.waitingPayment ?? 0}
               color="info"
               icon={'fluent-mdl2:time-entry'}
             />

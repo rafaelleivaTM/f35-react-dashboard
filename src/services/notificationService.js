@@ -1,5 +1,5 @@
 // Use Notifications API to show alert messages
-const notificationsService = {
+const notificationService = {
   show: (message) => {
     if (Notification.permission === 'granted') {
       new Notification(message, { icon: '/favicon/f35-plane.png' });
@@ -12,7 +12,7 @@ const notificationsService = {
   },
 };
 
-export default notificationsService;
+export default notificationService;
 
 /** Usage example:
  * when isCritical is true, the notification is shown as a desktop notification
