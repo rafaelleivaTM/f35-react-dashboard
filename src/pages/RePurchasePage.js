@@ -1,7 +1,7 @@
-import { Helmet } from "react-helmet-async";
-import { filter } from "lodash";
-import { sentenceCase } from "change-case";
-import { useEffect, useState } from "react";
+import { Helmet } from 'react-helmet-async';
+import { filter } from 'lodash';
+import { sentenceCase } from 'change-case';
+import { useEffect, useState } from 'react';
 // @mui
 import {
   Box,
@@ -24,23 +24,24 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
-  Typography
-} from "@mui/material";
+  Typography,
+} from '@mui/material';
 // components
-import { useSelector } from "react-redux";
-import * as moment from "moment";
-import Label from "../components/label";
-import Iconify from "../components/iconify";
-import Scrollbar from "../components/scrollbar";
+import { useSelector } from 'react-redux';
+import * as moment from 'moment';
+import { useNavigate } from 'react-router-dom';
+import Label from '../components/label';
+import Iconify from '../components/iconify';
+import Scrollbar from '../components/scrollbar';
 // sections
-import { RePurchaseListHead, RePurchaseListToolbar, RePurchaseOptions } from "../sections/@dashboard/repurchase";
+import { RePurchaseListHead, RePurchaseListToolbar, RePurchaseOptions } from '../sections/@dashboard/repurchase';
 
-import apiService from "../services/apiService";
-import { BRAND_COLORS, F35_ROBOTS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_DATA } from "../utils/constants";
-import { getAbbreviation } from "../utils/functionsUtils";
-import LetterAvatar from "../components/letter-avatar";
-import { api } from "../redux/api/apiSlice";
-import UpdatePurchaseMethodScheduleDialog from "../sections/re-purchase/dialogs/UpdatePurchaseMethodScheduleDialog";
+import apiService from '../services/apiService';
+import { BRAND_COLORS, F35_ROBOTS, F35_STATUS, F35_STATUS_COLORS, ROBOTS_VISUAL_DATA } from '../utils/constants';
+import { getAbbreviation } from '../utils/functionsUtils';
+import LetterAvatar from '../components/letter-avatar';
+import { api } from '../redux/api/apiSlice';
+import UpdatePurchaseMethodScheduleDialog from '../sections/re-purchase/dialogs/UpdatePurchaseMethodScheduleDialog';
 
 // ----------------------------------------------------------------------
 
@@ -86,6 +87,8 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function RePurchasePage() {
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -416,6 +419,12 @@ export default function RePurchasePage() {
 
   const isNotFound = !filteredSchedules.length && !!filterName;
 
+  const handleSeeOrderDetails = (orderId) => {
+    // navigate(`/dashboard/order-details/${orderId}`);
+    const url = `/dashboard/order-details/${orderId}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <>
       <Helmet>
@@ -499,7 +508,10 @@ export default function RePurchasePage() {
 
                         <TableCell align="center">
                           <Stack direction={'row'} alignItems={'center'} spacing={1}>
-                            <Iconify icon={'eva:checkmark-circle-2-fill'} sx={{ color: 'rgb(64,157,95)' }} />
+                            {/* <Iconify icon={'eva:checkmark-circle-2-fill'} sx={{ color: 'rgb(64,157,95)' }} /> */}
+                            <IconButton size="large" color="inherit" onClick={() => handleSeeOrderDetails(orderId)}>
+                              <Iconify icon={'mdi:eye'} />
+                            </IconButton>
                             <IconButton size="large" color="inherit" onClick={(event) => handleOpenMenu(event, id)}>
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton>
