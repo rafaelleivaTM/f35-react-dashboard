@@ -29,7 +29,6 @@ import {
 // components
 import { useSelector } from 'react-redux';
 import * as moment from 'moment';
-import { useNavigate } from 'react-router-dom';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -87,8 +86,6 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function RePurchasePage() {
-  const navigate = useNavigate();
-
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
