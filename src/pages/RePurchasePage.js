@@ -194,18 +194,18 @@ export default function RePurchasePage() {
   };
 
   const deleteSingleSchedule = (id) => {
-    // deleteSchedules([id])
-    //   .then((response) => {
-    //     if (response?.data && response.data.statusCode === 200) {
-    //       searchOrdersTrigger();
-    //       console.log('Response success from deleteSingleSchedule', response);
-    //     } else {
-    //       console.error('Response fail from deleteSingleSchedule', response);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.log('error from deleteSingleSchedule', error);
-    //   });
+    deleteSchedules([id])
+      .then((response) => {
+        if (response?.data && response.data.statusCode === 200) {
+          searchOrdersTrigger();
+          console.log('Response success from deleteSingleSchedule', response);
+        } else {
+          console.error('Response fail from deleteSingleSchedule', response);
+        }
+      })
+      .catch((error) => {
+        console.log('error from deleteSingleSchedule', error);
+      });
   };
 
   const handleConfirmUpdateOrdersToRepurchaseAction = () => {

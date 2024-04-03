@@ -1,11 +1,11 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 // @mui
-import { alpha, styled } from "@mui/material/styles";
-import { Button, InputAdornment, OutlinedInput, Stack, Toolbar, Typography } from "@mui/material";
+import { alpha, styled } from '@mui/material/styles';
+import { Button, InputAdornment, OutlinedInput, Stack, Toolbar, Typography } from '@mui/material';
 // component
-import { useRef, useState } from "react";
-import Iconify from "../../../components/iconify";
-import { parseSearchInput } from "../../../utils/functionsUtils";
+import { useRef, useState } from 'react';
+import Iconify from '../../../components/iconify';
+import { parseSearchInput } from '../../../utils/functionsUtils';
 
 // ----------------------------------------------------------------------
 
@@ -125,15 +125,15 @@ export default function RePurchaseListToolbar({
 
       {numSelected > 0 ? (
         <Stack direction={'row'} spacing={3}>
-          {/* <Button */}
-          {/*  variant="contained" */}
-          {/*  color={'error'} */}
-          {/*  startIcon={<Iconify icon="eva:trash-2-fill" />} */}
-          {/*  onClick={handleDeleteScheduleAction} */}
-          {/*  disabled={selectedOrders.length === 0} */}
-          {/* > */}
-          {/*  Delete Schedules */}
-          {/* </Button> */}
+          <Button
+            variant="contained"
+            color={'error'}
+            startIcon={<Iconify icon="eva:trash-2-fill" />}
+            onClick={handleDeleteScheduleAction}
+            disabled={selectedOrders.length === 0}
+          >
+            Delete Schedules
+          </Button>
           <Button
             variant="contained"
             color={'warning'}

@@ -81,7 +81,7 @@ export const api = createApi({
     }),
     getOrderToPurchaseDataForOrder: build.query({
       query: (orderId) => `/data/getOrderToPurchaseData?order=${orderId}`,
-      transformResponse: (response) => response?.data?.[0],
+      transformResponse: (response) => response?.data || {},
     }),
     getOrderSchedulesForOrder: build.query({
       query: (orderId) => `/data/getOrderSchedules?order=${orderId}`,
